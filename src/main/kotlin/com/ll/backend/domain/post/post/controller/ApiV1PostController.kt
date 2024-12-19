@@ -14,7 +14,7 @@ class ApiV1PostController {
         @PathVariable id: Long
     ): PostDto {
         return PostDto(
-            id = 1,
+            id = id,
             title = "title",
             body = "body"
         )
