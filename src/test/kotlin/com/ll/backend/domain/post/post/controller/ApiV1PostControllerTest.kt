@@ -37,4 +37,23 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.title").exists())
             .andExpect(jsonPath("$.body").exists())
     }
+
+    @Test
+    @DisplayName("GET /api/v1/posts/2")
+    fun t2() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                get("/api/v1/posts/2")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.id").value(2))
+            .andExpect(jsonPath("$.title").exists())
+            .andExpect(jsonPath("$.body").exists())
+    }
 }
