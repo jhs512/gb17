@@ -22,7 +22,7 @@ abstract class BaseEntity : Persistable<Long> {
 
         other as BaseEntity
 
-        if (id == null || other.id == null) return false
+        if (id == null) return false
 
         return id == other.id
     }

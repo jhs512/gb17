@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
@@ -135,7 +136,8 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/posts/1")
+    @DisplayName("DELETE /api/v1/posts/1, with user1, 200")
+    @WithUserDetails("user1")
     fun t5() {
         // WHEN
         val resultActions = mockMvc
@@ -155,7 +157,8 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("PUT /api/v1/posts/1")
+    @DisplayName("PUT /api/v1/posts/1, with user1, 200")
+    @WithUserDetails("user1")
     fun t6() {
         // WHEN
         val resultActions = mockMvc
@@ -168,7 +171,7 @@ class ApiV1PostControllerTest @Autowired constructor(
                             "title": "제목 수정",
                             "body": "내용 수정"
                         }
-                        """
+                        """.trimIndent()
                     )
             )
             .andDo(print())
@@ -185,5 +188,53 @@ class ApiV1PostControllerTest @Autowired constructor(
         val post = postService.findById(1).get()
         assertThat(post.title).isEqualTo("제목 수정")
         assertThat(post.body).isEqualTo("내용 수정")
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/posts/1 with user2, 403")
+    @WithUserDetails("user2")
+    fun t7() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                delete("/api/v1/posts/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.msg").value("글의 작성자만 삭제할 수 있습니다."))
+
+        assertThat(postService.findById(1)).isPresent
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/posts/1 with user2, 403")
+    @WithUserDetails("user2")
+    fun t8() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                put("/api/v1/posts/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "제목 수정",
+                            "body": "내용 수정"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.msg").value("글의 작성자만 수정할 수 있습니다."))
     }
 }

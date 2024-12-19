@@ -1,6 +1,5 @@
-package com.ll.gb.global.jpa.entity
+package com.ll.backend.global.jpa.entity
 
-import com.ll.backend.global.jpa.entity.BaseEntity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass
 import org.springframework.data.annotation.CreatedDate
