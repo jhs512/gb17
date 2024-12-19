@@ -18,11 +18,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Transactional
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 class ApiV1PostControllerTest @Autowired constructor(
     private val postService: PostService,
     private val mockMvc: MockMvc
@@ -147,6 +149,8 @@ class ApiV1PostControllerTest @Autowired constructor(
         // THEN
         resultActions
             .andExpect(status().isOk)
+            .andExpect(jsonPath("$.resultCode").value("200-1"))
+            .andExpect(jsonPath("$.msg").value("1번 글이 삭제되었습니다."))
 
         assertThat(postService.findById(1).isEmpty).isTrue()
     }
