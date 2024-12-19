@@ -34,8 +34,8 @@ class ApiV1PostControllerTest @Autowired constructor(
         resultActions
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.title").exists())
-            .andExpect(jsonPath("$.body").exists())
+            .andExpect(jsonPath("$.title").value("안녕하세요."))
+            .andExpect(jsonPath("$.body").value("반갑습니다."))
     }
 
     @Test
@@ -53,7 +53,7 @@ class ApiV1PostControllerTest @Autowired constructor(
         resultActions
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(2))
-            .andExpect(jsonPath("$.title").exists())
-            .andExpect(jsonPath("$.body").exists())
+            .andExpect(jsonPath("$.title").value("Hello."))
+            .andExpect(jsonPath("$.body").value("Nice to meet you."))
     }
 }
