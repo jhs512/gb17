@@ -6,5 +6,6 @@ import jakarta.persistence.Entity
 @Entity
 class Post(
     var title: String = "",
-    var body: String = ""
+    var body: String = "",
+    var published: Boolean = false
 ) : BaseTime()

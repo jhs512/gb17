@@ -14,8 +14,8 @@ class BaseInitData(
         return ApplicationRunner {
             if (postService.count() > 0) return@ApplicationRunner
 
-            postService.write("안녕하세요.", "반갑습니다.")
-            postService.write("Hello.", "Nice to meet you.")
+            postService.write("안녕하세요.", "반갑습니다.", true)
+            postService.write("Hello.", "Nice to meet you.", true)
         }
     }
 }

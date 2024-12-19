@@ -1,5 +1,8 @@
 package com.ll.backend.domain.post.post.controller
 
+import com.ll.backend.domain.post.post.entity.Post
+import com.ll.backend.domain.post.post.service.PostService
+import com.ll.backend.global.app.AppConfig
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class ApiV1PostControllerTest @Autowired constructor(
+    private val postService: PostService,
     private val mockMvc: MockMvc
 ) {
     @Test
@@ -56,5 +60,31 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.id").value(2))
             .andExpect(jsonPath("$.title").value("Hello."))
             .andExpect(jsonPath("$.body").value("Nice to meet you."))
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/posts")
+    fun t3() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                get("/api/v1/posts")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        val posts: List<Post> = postService.findByPublishedLimit(true, 0, AppConfig.BASE_PAGE_SIZE)
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(posts.size))
+
+        for (i in posts.indices) {
+            resultActions
+                .andExpect(jsonPath("$[$i].id").value(posts[i].id))
+                .andExpect(jsonPath("$[$i].title").value(posts[i].title))
+                .andExpect(jsonPath("$[$i].body").value(posts[i].body))
+        }
     }
 }
