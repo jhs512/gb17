@@ -1,5 +1,7 @@
 package com.ll.backend.domain.post.post.controller
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ll.backend.domain.post.post.entity.Post
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
@@ -14,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -27,8 +30,14 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ApiV1PostControllerTest @Autowired constructor(
     private val postService: PostService,
-    private val mockMvc: MockMvc
+    private val mockMvc: MockMvc,
+    private val objectMapper: ObjectMapper
 ) {
+    private fun bodyMap(resultActions: ResultActions): Map<String, *> {
+        val contentAsString = resultActions.andReturn().response.contentAsString
+        return objectMapper.readValue(contentAsString, object : TypeReference<Map<String, *>>() {})
+    }
+
     @Test
     @DisplayName("GET /api/v1/posts/1")
     fun t1() {
@@ -79,7 +88,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andDo(print())
 
         val postPage: Page<Post> = postService
-            .findByPublishedPaged(true, 1, AppConfig.BASE_PAGE_SIZE)
+            .findByPublishedPaged(true, 1, AppConfig.basePageSize)
 
         // THEN
         resultActions
@@ -136,9 +145,44 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/posts/1, with user1, 200")
+    @DisplayName("POST /api/v1/posts, with user1, 200")
     @WithUserDetails("user1")
     fun t5() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/posts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "글 제목",
+                            "body": "글 내용"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        val body = bodyMap(resultActions)
+        val newPostId = (body["data"] as Map<String, *>)["id"] as Int
+
+        assertThat(newPostId).isGreaterThan(2)
+
+        // THEN
+        resultActions
+            .andExpect(status().isCreated)
+            .andExpect(jsonPath("$.resultCode").value("201-1"))
+            .andExpect(jsonPath("$.msg").value("${newPostId}번 글이 작성되었습니다."))
+            .andExpect(jsonPath("$.data.id").value(newPostId))
+            .andExpect(jsonPath("$.data.title").value("글 제목"))
+            .andExpect(jsonPath("$.data.body").value("글 내용"))
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/posts/1, with user1, 200")
+    @WithUserDetails("user1")
+    fun t6() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -159,7 +203,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("PUT /api/v1/posts/1, with user1, 200")
     @WithUserDetails("user1")
-    fun t6() {
+    fun t7() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -191,9 +235,35 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
+    @DisplayName("POST /api/v1/posts/1, without user, 403")
+    fun t8() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/posts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "글 제목",
+                            "body": "글 내용"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."))
+    }
+
+    @Test
     @DisplayName("DELETE /api/v1/posts/1 with user2, 403")
     @WithUserDetails("user2")
-    fun t7() {
+    fun t9() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -214,7 +284,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("PUT /api/v1/posts/1 with user2, 403")
     @WithUserDetails("user2")
-    fun t8() {
+    fun t10() {
         // WHEN
         val resultActions = mockMvc
             .perform(

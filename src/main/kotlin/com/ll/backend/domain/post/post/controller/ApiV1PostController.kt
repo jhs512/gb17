@@ -25,7 +25,7 @@ class ApiV1PostController(
     @GetMapping
     fun getItems(
         page: Int = 1,
-        @Min(1) @Max(AppConfig.BASE_PAGE_SIZE.toLong()) pageSize: Int = AppConfig.BASE_PAGE_SIZE
+        @Min(1) @Max(AppConfig.basePageSize.toLong()) pageSize: Int = AppConfig.basePageSize
     ): PageDto<PostDto> {
         return PageDto(
             postService
@@ -61,7 +61,7 @@ class ApiV1PostController(
         val post = postService.write(PostAuthor(rq.actor), reqBody.title, reqBody.body, true)
 
         return RsData(
-            "200-1",
+            "201-1",
             "${post.id}번 글이 작성되었습니다.",
             PostDto(post)
         )

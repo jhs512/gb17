@@ -2,19 +2,28 @@ package com.ll.backend.global.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
-class SecurityConfig {
+class SecurityConfig(
+    private val customAuthenticationEntryPoint: AuthenticationEntryPoint
+) {
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         httpSecurity {
             authorizeHttpRequests {
-                authorize("/**", permitAll)
+                authorize(HttpMethod.GET, "/api/*/posts", permitAll)
+                authorize(HttpMethod.GET, "/api/*/posts/{id}", permitAll)
+                authorize(HttpMethod.POST, "/api/*/members/login", permitAll)
+                authorize(HttpMethod.DELETE, "/api/*/members/logout", permitAll)
+                authorize(HttpMethod.POST, "/api/*/members/join", permitAll)
+                authorize("/api/*/**", authenticated)
             }
 
             headers {
@@ -24,6 +33,12 @@ class SecurityConfig {
             }
 
             csrf { disable() }
+
+            formLogin { disable() }
+
+            exceptionHandling {
+                authenticationEntryPoint = customAuthenticationEntryPoint
+            }
         }
 
         return httpSecurity.build()
@@ -34,8 +49,9 @@ class SecurityConfig {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("https://cdpn.io")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
+        configuration.allowCredentials = true
         val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/api/**", configuration)
+        source.registerCorsConfiguration("/api/*/**", configuration)
         return source
     }
 }
