@@ -13,10 +13,18 @@ class ApiV1PostController {
     fun getItem(
         @PathVariable id: Long
     ): PostDto {
+        if (id == 1L) {
+            return PostDto(
+                id = id,
+                title = "안녕하세요.",
+                body = "반갑습니다."
+            )
+        }
+
         return PostDto(
             id = id,
-            title = "title",
-            body = "body"
+            title = "Hello.",
+            body = "Nice to meet you."
         )
     }
 }
