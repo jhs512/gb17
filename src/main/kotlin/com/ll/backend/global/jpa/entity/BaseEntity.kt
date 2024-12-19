@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
+import org.hibernate.Hibernate
 import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
@@ -18,13 +19,11 @@ abstract class BaseEntity : Persistable<Long> {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
 
         other as BaseEntity
 
-        if (id == null) return false
-
-        return id == other.id
+        return id == other.getId()
     }
 
     override fun hashCode(): Int {

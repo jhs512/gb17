@@ -1,6 +1,6 @@
 package com.ll.backend.domain.post.post.service
 
-import com.ll.backend.domain.member.member.entity.Member
+import com.ll.backend.domain.post.author.entity.PostAuthor
 import com.ll.backend.domain.post.post.entity.Post
 import com.ll.backend.domain.post.post.repository.PostRepository
 import com.ll.backend.global.exceptions.ServiceException
@@ -22,7 +22,7 @@ class PostService(
         return postRepository.count()
     }
 
-    fun write(author: Member, title: String, body: String, published: Boolean = false): Post {
+    fun write(author: PostAuthor, title: String, body: String, published: Boolean = false): Post {
         return postRepository.save(Post(author = author, title = title, body = body, published = published))
     }
 
@@ -43,15 +43,15 @@ class PostService(
         return post
     }
 
-    fun checkPermissionToDelete(actor: Member, post: Post) {
+    fun checkPermissionToDelete(actor: PostAuthor, post: Post) {
         if (actor != post.author) throw ServiceException("403-1", "글의 작성자만 삭제할 수 있습니다.")
     }
 
-    fun checkPermissionToModify(actor: Member, post: Post) {
+    fun checkPermissionToModify(actor: PostAuthor, post: Post) {
         if (actor != post.author) throw ServiceException("403-1", "글의 작성자만 수정할 수 있습니다.")
     }
 
-    fun checkPermissionToWrite(actor: Member) {
+    fun checkPermissionToWrite(actor: PostAuthor) {
         // 로그인이 되었다면 누구나 가능
     }
 }

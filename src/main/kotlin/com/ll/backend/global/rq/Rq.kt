@@ -13,6 +13,10 @@ import org.springframework.web.context.annotation.RequestScope
 class Rq(
     private val memberService: MemberService
 ) {
+    val isLogin: Boolean by lazy {
+        SecurityContextHolder.getContext()?.authentication?.isAuthenticated ?: false
+    }
+
     val user: SecurityUser by lazy {
         SecurityContextHolder.getContext()?.authentication?.principal as? SecurityUser
             ?: throw ServiceException("403-1", "securityUser 객체 취득실패, 로그인이 필요합니다.")
