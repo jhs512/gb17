@@ -20,7 +20,7 @@ class CustomUserDetailsService(
             member.getId(),
             member.username,
             member.password,
-            member.getAuthorities()
+            member.authorities
         )
     }
 }

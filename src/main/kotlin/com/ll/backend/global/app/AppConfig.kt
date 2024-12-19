@@ -10,16 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 class AppConfig(
-    @Value("\${spring.profiles.active}") private val activeProfileValue: String,
-    @Value("\${custom.jwt.secretKey}") private val jwtSecretKeyValue: String,
-    @Value("\${custom.accessToken.expirationSec}") private val accessTokenExpirationSecValue: Long,
-    @Value("\${custom.site.frontUrl}") private val siteFrontUrlValue: String,
-    @Value("\${custom.site.backUrl}") private val siteBackUrlValue: String,
-    @Value("\${custom.site.cookieDomain}") private val siteCookieDomainValue: String,
-    @Value("\${custom.temp.dirPath}") private val tempDirPathValue: String,
-    @Value("\${custom.genFile.dirPath}") private val genFileDirPathValue: String,
-    @Value("\${custom.site.name}") private val siteNameValue: String,
-    private val objectMapperValue: ObjectMapper
+    @Value("\${spring.profiles.active}") private val _activeProfile: String,
+    @Value("\${custom.jwt.secretKey}") private val _jwtSecretKey: String,
+    @Value("\${custom.accessToken.expirationSec}") private val _accessTokenExpirationSec: Long,
+    @Value("\${custom.site.frontUrl}") private val _siteFrontUrl: String,
+    @Value("\${custom.site.backUrl}") private val _siteBackUrl: String,
+    @Value("\${custom.site.cookieDomain}") private val _siteCookieDomain: String,
+    @Value("\${custom.temp.dirPath}") private val _tempDirPath: String,
+    @Value("\${custom.genFile.dirPath}") private val _genFileDirPath: String,
+    @Value("\${custom.site.name}") private val _siteName: String,
+    private val _objectMapper: ObjectMapper
 ) {
     companion object {
         lateinit var activeProfile: String
@@ -37,16 +37,16 @@ class AppConfig(
 
     @PostConstruct
     fun initStaticFields() {
-        activeProfile = activeProfileValue
-        jwtSecretKey = jwtSecretKeyValue
-        accessTokenExpirationSec = accessTokenExpirationSecValue
-        siteFrontUrl = siteFrontUrlValue
-        siteBackUrl = siteBackUrlValue
-        siteCookieDomain = siteCookieDomainValue
-        tempDirPath = tempDirPathValue
-        genFileDirPath = genFileDirPathValue
-        siteName = siteNameValue
-        objectMapper = objectMapperValue
+        activeProfile = _activeProfile
+        jwtSecretKey = _jwtSecretKey
+        accessTokenExpirationSec = _accessTokenExpirationSec
+        siteFrontUrl = _siteFrontUrl
+        siteBackUrl = _siteBackUrl
+        siteCookieDomain = _siteCookieDomain
+        tempDirPath = _tempDirPath
+        genFileDirPath = _genFileDirPath
+        siteName = _siteName
+        objectMapper = _objectMapper
     }
 
     @Bean

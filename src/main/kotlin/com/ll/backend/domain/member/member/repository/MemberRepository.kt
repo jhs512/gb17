@@ -6,4 +6,5 @@ import java.util.*
 
 interface MemberRepository : JpaRepository<Member, Long> {
     fun findByUsername(username: String): Optional<Member>
+    fun findByRefreshToken(refreshToken: String): Optional<Member>
 }

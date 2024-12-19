@@ -14,13 +14,17 @@ class Member(
     var password: String,
 
     @Column(length = 50)
-    var nickname: String
-) : BaseTime() {
-    fun getAuthorities(): Collection<GrantedAuthority> {
-        if (username == "admin") {
-            return listOf(GrantedAuthority { "ROLE_ADMIN" })
-        }
+    var nickname: String,
 
-        return listOf()
-    }
+    @Column(unique = true, length = 30)
+    var refreshToken: String
+) : BaseTime() {
+    val authorities: Collection<GrantedAuthority>
+        get() {
+            if (username == "admin") {
+                return listOf(GrantedAuthority { "ROLE_ADMIN" })
+            }
+
+            return listOf()
+        }
 }
