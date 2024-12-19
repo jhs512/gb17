@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -73,18 +74,25 @@ class ApiV1PostControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val posts: List<Post> = postService.findByPublishedLimit(true, 0, AppConfig.BASE_PAGE_SIZE)
+        val postPage: Page<Post> = postService
+            .findByPublishedPaged(true, 1, AppConfig.BASE_PAGE_SIZE)
 
         // THEN
         resultActions
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.length()").value(posts.size))
+            .andExpect(jsonPath("$.items.length()").value(postPage.numberOfElements))
+            .andExpect(jsonPath("$.totalItems").value(postPage.totalElements))
+            .andExpect(jsonPath("$.totalPages").value(postPage.totalPages))
+            .andExpect(jsonPath("$.currentPageNumber").value(postPage.number + 1))
+            .andExpect(jsonPath("$.pageSize").value(postPage.size))
+
+        val posts = postPage.content
 
         for (i in posts.indices) {
             resultActions
-                .andExpect(jsonPath("$[$i].id").value(posts[i].id))
-                .andExpect(jsonPath("$[$i].title").value(posts[i].title))
-                .andExpect(jsonPath("$[$i].body").value(posts[i].body))
+                .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
+                .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
+                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body))
         }
     }
 }

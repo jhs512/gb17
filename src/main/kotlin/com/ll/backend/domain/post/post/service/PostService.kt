@@ -24,13 +24,9 @@ class PostService(
         return postRepository.save(Post(title = title, body = body, published = published))
     }
 
-    fun findByPublished(published: Boolean, offset: Int, take: Int): Page<Post> {
-        val pageable = PageRequest.of(offset, take, Sort.by(Sort.Order.desc("id")))
+    fun findByPublishedPaged(published: Boolean, page: Int, pageSize: Int): Page<Post> {
+        val pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")))
 
         return postRepository.findByPublished(published, pageable)
-    }
-
-    fun findByPublishedLimit(published: Boolean, offset: Int, take: Int): List<Post> {
-        return findByPublished(published, offset, take).content
     }
 }
