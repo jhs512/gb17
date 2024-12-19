@@ -1,5 +1,6 @@
 package com.ll.backend.global.security
 
+import com.ll.backend.global.app.AppConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -51,7 +52,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("https://cdpn.io")
+        configuration.allowedOrigins = listOf("https://cdpn.io", AppConfig.siteFrontUrl)
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
         configuration.allowCredentials = true
         val source = UrlBasedCorsConfigurationSource()

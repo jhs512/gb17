@@ -3,6 +3,7 @@ package com.ll.backend.global.initData
 import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.domain.post.author.entity.PostAuthor
 import com.ll.backend.domain.post.post.service.PostService
+import com.ll.backend.global.app.AppConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -32,9 +33,16 @@ class BaseInitData(
         if (memberService.count() > 0) return
 
         val memberSystem = memberService.join("system", "1234", "시스템")
+        AppConfig.isNotProd().let { memberSystem.refreshToken = "system" }
+
         val memberAdmin = memberService.join("admin", "1234", "관리자")
+        AppConfig.isNotProd().let { memberAdmin.refreshToken = "admin" }
+
         val memberUser1 = memberService.join("user1", "1234", "유저1")
+        AppConfig.isNotProd().let { memberUser1.refreshToken = "user1" }
+
         val memberUser2 = memberService.join("user2", "1234", "유저2")
+        AppConfig.isNotProd().let { memberUser2.refreshToken = "user2" }
     }
 
     @Transactional

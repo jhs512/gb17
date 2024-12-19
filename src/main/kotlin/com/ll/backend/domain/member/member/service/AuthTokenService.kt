@@ -45,7 +45,7 @@ class AuthTokenService {
             .payload
 
         return mapOf(
-            "id" to payload.get("id", Int::class.java),
+            "id" to payload.get("id", Integer::class.java),
             "username" to payload.get("username", String::class.java),
             "authorities" to payload.get("authorities", List::class.java)
         )

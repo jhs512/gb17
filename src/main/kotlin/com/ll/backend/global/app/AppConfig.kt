@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 class AppConfig(
-    @Value("\${spring.profiles.active}") private val _activeProfile: String,
     @Value("\${custom.jwt.secretKey}") private val _jwtSecretKey: String,
     @Value("\${custom.accessToken.expirationSec}") private val _accessTokenExpirationSec: Long,
     @Value("\${custom.site.frontUrl}") private val _siteFrontUrl: String,
@@ -22,7 +21,6 @@ class AppConfig(
     private val _objectMapper: ObjectMapper
 ) {
     companion object {
-        lateinit var activeProfile: String
         lateinit var jwtSecretKey: String
         var accessTokenExpirationSec: Long = 0
         lateinit var siteFrontUrl: String
@@ -33,11 +31,14 @@ class AppConfig(
         lateinit var siteName: String
         lateinit var objectMapper: ObjectMapper
         const val basePageSize = 10
+
+        fun isNotProd(): Boolean {
+            return true
+        }
     }
 
     @PostConstruct
     fun initStaticFields() {
-        activeProfile = _activeProfile
         jwtSecretKey = _jwtSecretKey
         accessTokenExpirationSec = _accessTokenExpirationSec
         siteFrontUrl = _siteFrontUrl
