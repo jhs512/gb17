@@ -33,4 +33,11 @@ class PostService(
     fun delete(post: Post) {
         postRepository.delete(post)
     }
+
+    fun modify(post: Post, title: String, body: String): Post {
+        post.title = title
+        post.body = body
+
+        return post
+    }
 }

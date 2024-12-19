@@ -13,8 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -153,5 +152,38 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.msg").value("1번 글이 삭제되었습니다."))
 
         assertThat(postService.findById(1).isEmpty).isTrue()
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/posts/1")
+    fun t6() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                put("/api/v1/posts/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "제목 수정",
+                            "body": "내용 수정"
+                        }
+                        """
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.resultCode").value("200-1"))
+            .andExpect(jsonPath("$.msg").value("1번 글이 수정되었습니다."))
+            .andExpect(jsonPath("$.data.id").value(1))
+            .andExpect(jsonPath("$.data.title").value("제목 수정"))
+            .andExpect(jsonPath("$.data.body").value("내용 수정"))
+
+        val post = postService.findById(1).get()
+        assertThat(post.title).isEqualTo("제목 수정")
+        assertThat(post.body).isEqualTo("내용 수정")
     }
 }

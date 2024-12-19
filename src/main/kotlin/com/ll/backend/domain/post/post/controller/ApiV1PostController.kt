@@ -1,12 +1,14 @@
 package com.ll.backend.domain.post.post.controller
 
 import com.ll.backend.domain.post.post.dto.PostDto
+import com.ll.backend.domain.post.post.dto.PostModifyRequest
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
 import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.page.dto.PageDto
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
@@ -44,5 +46,21 @@ class ApiV1PostController(
         postService.delete(post)
 
         return RsData("200-1", "${id}번 글이 삭제되었습니다.")
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    fun modify(
+        @PathVariable id: Long,
+        @RequestBody request: PostModifyRequest
+    ): RsData<PostDto> {
+        val post = postService.findById(id).get()
+        postService.modify(post, request.title, request.body)
+
+        return RsData(
+            "200-1",
+            "${id}번 글이 수정되었습니다.",
+            PostDto(post)
+        )
     }
 }
