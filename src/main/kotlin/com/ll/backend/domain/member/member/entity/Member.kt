@@ -10,7 +10,7 @@ class Member(
     @Column(unique = true, length = 30)
     var username: String,
 
-    @Column(length = 50)
+    @Column(length = 100)
     var password: String,
 
     @Column(length = 50)
