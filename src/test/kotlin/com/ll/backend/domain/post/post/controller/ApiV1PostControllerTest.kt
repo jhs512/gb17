@@ -3,6 +3,7 @@ package com.ll.backend.domain.post.post.controller
 import com.ll.backend.domain.post.post.entity.Post
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -94,5 +96,58 @@ class ApiV1PostControllerTest @Autowired constructor(
                 .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
                 .andExpect(jsonPath("$.items[$i].body").value(posts[i].body))
         }
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/posts?page=2&pageSize=1")
+    fun t4() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                get("/api/v1/posts")
+                    .param("page", "2")
+                    .param("pageSize", "1")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        val postPage = postService
+            .findByPublishedPaged(true, 2, 1)
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.items.length()").value(postPage.numberOfElements))
+            .andExpect(jsonPath("$.totalItems").value(postPage.totalElements))
+            .andExpect(jsonPath("$.totalPages").value(postPage.totalPages))
+            .andExpect(jsonPath("$.currentPageNumber").value(postPage.number + 1))
+            .andExpect(jsonPath("$.pageSize").value(postPage.size))
+
+        val posts = postPage.content
+
+        for (i in posts.indices) {
+            resultActions
+                .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
+                .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
+                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body))
+        }
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/posts/1")
+    fun t5() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                delete("/api/v1/posts/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+
+        assertThat(postService.findById(1).isEmpty).isTrue()
     }
 }

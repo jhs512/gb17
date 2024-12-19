@@ -29,4 +29,8 @@ class PostService(
 
         return postRepository.findByPublished(published, pageable)
     }
+
+    fun delete(id: Long) {
+        postRepository.deleteById(id)
+    }
 }
