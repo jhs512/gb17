@@ -19,8 +19,4 @@ class PostAuthor(
         this.createDate = member.createDate
         this.modifyDate = member.modifyDate
     }
-
-    override fun toString(): String {
-        return "PostAuthor(id=$id, createDate='$createDate', modifyDate='$modifyDate', name='$name')"
-    }
 }
