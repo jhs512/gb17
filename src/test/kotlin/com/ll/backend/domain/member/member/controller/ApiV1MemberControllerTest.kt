@@ -36,7 +36,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/members/join")
-    fun t1() {
+    fun t01() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -73,7 +73,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/members/join conflict")
-    fun t2() {
+    fun t02() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -100,7 +100,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/members/login")
-    fun t3() {
+    fun t03() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -135,7 +135,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/members/login, with wrong username, 401")
-    fun t4() {
+    fun t04() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -161,7 +161,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/members/login, with wrong password, 401")
-    fun t5() {
+    fun t05() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -186,8 +186,8 @@ class ApiV1MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("POST /api/v1/members/login, with no input username, 400")
-    fun t6() {
+    @DisplayName("POST /api/v1/members/login, with no input, 400")
+    fun t06() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -199,11 +199,78 @@ class ApiV1MemberControllerTest @Autowired constructor(
         // THEN
         resultActions
             .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.resultCode").value("400-1"))
+            .andExpect(jsonPath("$.msg").value("요청 데이터가 올바르지 않습니다."))
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/members/login, with no password input, 400")
+    fun t07() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user1",
+                            "password": ""
+                        }
+                    """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.resultCode").value("400-1"))
+            .andExpect(
+                jsonPath("$.msg").value(
+                    """
+                password-NotBlank-must not be blank
+            """.trimIndent()
+                )
+            )
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/members/login, with blank input, 400")
+    fun t08() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "",
+                            "password": ""
+                        }
+                    """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.resultCode").value("400-1"))
+            .andExpect(
+                jsonPath("$.msg").value(
+                    """
+                password-NotBlank-must not be blank
+                username-NotBlank-must not be blank
+            """.trimIndent()
+                )
+            )
     }
 
     @Test
     @DisplayName("POST /api/v1/members/login, check cross domain cookies")
-    fun t7() {
+    fun t09() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -245,7 +312,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("DELETE /api/v1/members/logout")
-    fun t8() {
+    fun t10() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -267,7 +334,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
     @Test
     @WithUserDetails("user1")
     @DisplayName("GET /api/v1/members/me")
-    fun t9() {
+    fun t11() {
         // WHEN
         val resultActions = mockMvc
             .perform(

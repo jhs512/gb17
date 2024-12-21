@@ -10,27 +10,33 @@ import com.ll.backend.standard.extensions.getOrThrow
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.validation.annotation.Validated
+import jakarta.validation.constraints.NotNull
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 @RequestMapping("/api/v1/members")
-@Validated
 class ApiV1MemberController(
     private val memberService: MemberService,
     private val rq: Rq
 ) {
     data class MemberJoinReqBody(
-        @NotBlank
+        @field:NotBlank
+        @field:NotNull
         val username: String,
-        @NotBlank
+
+        @field:NotBlank
+        @field:NotNull
         val password: String,
-        @NotBlank
+
+        @field:NotBlank
+        @field:NotNull
         val nickname: String
     )
 
     @PostMapping("/join")
+    @Transactional
     fun join(
         @RequestBody @Valid reqBody: MemberJoinReqBody
     ): RsData<MemberDto> {
@@ -45,9 +51,11 @@ class ApiV1MemberController(
 
 
     data class MemberLoginReqBody(
-        @NotBlank
+        @field:NotBlank
+        @field:NotNull
         val username: String,
-        @NotBlank
+        @field:NotBlank
+        @field:NotNull
         val password: String,
     )
 
@@ -58,6 +66,7 @@ class ApiV1MemberController(
     )
 
     @PostMapping("/login")
+    @Transactional
     fun login(
         @RequestBody @Valid reqBody: MemberLoginReqBody
     ): RsData<MemberLoginResBody> {
@@ -92,6 +101,7 @@ class ApiV1MemberController(
 
 
     @GetMapping("/me")
+    @Transactional(readOnly = true)
     fun me(): RsData<MemberDto> {
         val member = memberService.findById(rq.actor.id).getOrThrow()
         return RsData("200-1", "OK", MemberDto(member))

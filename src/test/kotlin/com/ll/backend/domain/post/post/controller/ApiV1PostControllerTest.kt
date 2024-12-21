@@ -40,7 +40,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("GET /api/v1/posts/1")
-    fun t1() {
+    fun t01() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -59,7 +59,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("GET /api/v1/posts/2")
-    fun t2() {
+    fun t02() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -78,7 +78,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("GET /api/v1/posts")
-    fun t3() {
+    fun t03() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -110,7 +110,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("GET /api/v1/posts?page=2&pageSize=1")
-    fun t4() {
+    fun t04() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -145,7 +145,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("POST /api/v1/posts, with user1, 200")
     @WithUserDetails("user1")
-    fun t5() {
+    fun t05() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -180,7 +180,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("DELETE /api/v1/posts/1, with user1, 200")
     @WithUserDetails("user1")
-    fun t6() {
+    fun t06() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -200,7 +200,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("PUT /api/v1/posts/1, with user1, 200")
     @WithUserDetails("user1")
-    fun t7() {
+    fun t07() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -233,7 +233,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("POST /api/v1/posts/1, without user, 403")
-    fun t8() {
+    fun t08() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -260,7 +260,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("DELETE /api/v1/posts/1 with user2, 403")
     @WithUserDetails("user2")
-    fun t9() {
+    fun t09() {
         // WHEN
         val resultActions = mockMvc
             .perform(

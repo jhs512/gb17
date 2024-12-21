@@ -53,9 +53,9 @@ class ApiV1PostController(
 
 
     data class PostWriteReqBody(
-        @NotBlank
+        @field:NotBlank
         val title: String,
-        @NotBlank
+        @field:NotBlank
         val body: String
     )
 
@@ -90,9 +90,9 @@ class ApiV1PostController(
 
 
     data class PostModifyReqBody(
-        @NotBlank
+        @field:NotBlank
         val title: String,
-        @NotBlank
+        @field:NotBlank
         val body: String
     )
 

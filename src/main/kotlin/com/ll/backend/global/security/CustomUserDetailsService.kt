@@ -13,7 +13,7 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(username: String): UserDetails {
         val member = memberRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("사용자를 찾을 수 없습니다.") }
+            ?: throw UsernameNotFoundException("해당 유저를 찾을 수 없습니다. username: $username")
 
         return SecurityUser(
             member.id,

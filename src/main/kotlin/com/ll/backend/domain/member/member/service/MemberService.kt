@@ -50,7 +50,7 @@ class MemberService(
     }
 
     fun findByUsername(username: String): Member? {
-        return memberRepository.findByUsername(username).orElse(null)
+        return memberRepository.findByUsername(username)
     }
 
     fun genAccessToken(member: Member): String {
@@ -62,12 +62,10 @@ class MemberService(
     }
 
     fun refreshAccessToken(refreshToken: String): RsData<String> {
-        val member: Member = memberRepository.findByRefreshToken(refreshToken).orElseThrow {
-            ServiceException(
-                "404-1",
-                "존재하지 않는 리프레시 토큰입니다."
-            )
-        }
+        val member: Member = memberRepository.findByRefreshToken(refreshToken) ?: throw ServiceException(
+            "404-1",
+            "존재하지 않는 리프레시 토큰입니다."
+        )
 
         val accessToken = authTokenService.genAccessToken(member)
 
