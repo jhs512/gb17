@@ -5,6 +5,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -12,6 +13,7 @@ class CustomOAuth2UserService(
     private val memberService: MemberService
 ) : DefaultOAuth2UserService() {
     // 카카오톡 로그인이 성공할 때 마다 이 함수가 실행된다.
+    @Transactional
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val oAuth2User = super.loadUser(userRequest)
 

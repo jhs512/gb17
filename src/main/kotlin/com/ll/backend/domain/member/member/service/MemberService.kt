@@ -38,6 +38,7 @@ class MemberService(
             username = username,
             password = passwordEncoder.encode(password),
             nickname = nickname,
+            profileImgUrl = profileImgUrl,
             refreshToken = authTokenService.genRefreshToken()
         )
 
@@ -88,7 +89,10 @@ class MemberService(
             modifyDate,
             username,
             "",
-            authorities.stream().map { role -> SimpleGrantedAuthority(role) }.toList()
+            authorities
+                .stream()
+                .map { role -> SimpleGrantedAuthority(role) }
+                .toList()
         )
     }
 
@@ -111,7 +115,7 @@ class MemberService(
             member.nickname = nickname
             member.profileImgUrl = profileImgUrl
 
-            memberRepository.save(member)
+            member
         }
     }
 }

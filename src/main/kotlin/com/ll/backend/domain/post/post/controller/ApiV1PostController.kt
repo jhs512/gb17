@@ -28,6 +28,7 @@ class ApiV1PostController(
         get() = Author(rq.actor)
 
     @GetMapping
+    @Transactional(readOnly = true)
     fun getItems(
         page: Int = 1,
         @Min(1) @Max(50) pageSize: Int = AppConfig.basePageSize
@@ -41,6 +42,7 @@ class ApiV1PostController(
 
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     fun getItem(
         @PathVariable id: Long
     ): PostDto {
@@ -58,6 +60,7 @@ class ApiV1PostController(
     )
 
     @PostMapping
+    @Transactional
     fun write(
         @RequestBody @Valid reqBody: PostWriteReqBody
     ): RsData<PostDto> {
@@ -74,6 +77,7 @@ class ApiV1PostController(
 
 
     @DeleteMapping("/{id}")
+    @Transactional
     fun delete(@PathVariable id: Long): RsData<Empty> {
         val post = postService.findById(id).getOrThrow()
 
