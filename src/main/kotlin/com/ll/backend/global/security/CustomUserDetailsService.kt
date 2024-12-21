@@ -11,7 +11,6 @@ class CustomUserDetailsService(
     private val memberRepository: MemberRepository
 ) : UserDetailsService {
 
-    @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
         val member = memberRepository.findByUsername(username)
             .orElseThrow { UsernameNotFoundException("사용자를 찾을 수 없습니다.") }

@@ -15,7 +15,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val customAuthenticationEntryPoint: AuthenticationEntryPoint
+    private val customAuthenticationEntryPoint: AuthenticationEntryPoint,
+    private val customAuthenticationSuccessHandler: CustomAuthenticationSuccessHandler
 ) {
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
@@ -26,7 +27,8 @@ class SecurityConfig(
                 authorize(HttpMethod.POST, "/api/*/members/login", permitAll)
                 authorize(HttpMethod.DELETE, "/api/*/members/logout", permitAll)
                 authorize(HttpMethod.POST, "/api/*/members/join", permitAll)
-                authorize("/api/*/**", authenticated)
+                authorize("/api/v1/**", authenticated)
+                authorize(anyRequest, permitAll)
             }
 
             headers {
@@ -44,6 +46,10 @@ class SecurityConfig(
             }
 
             addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtAuthenticationFilter)
+
+            oauth2Login {
+                authenticationSuccessHandler = customAuthenticationSuccessHandler
+            }
         }
 
         return httpSecurity.build()

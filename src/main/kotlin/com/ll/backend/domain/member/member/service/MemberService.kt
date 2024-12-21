@@ -21,7 +21,12 @@ class MemberService(
         return memberRepository.count()
     }
 
-    fun join(username: String, password: String, nickname: String): Member {
+    fun join(
+        username: String,
+        password: String,
+        nickname: String,
+        profileImgUrl: String
+    ): Member {
         findByUsername(username)?.let {
             throw ServiceException(
                 "409-1",
@@ -37,6 +42,10 @@ class MemberService(
         )
 
         return memberRepository.save(member)
+    }
+
+    fun join(username: String, password: String, nickname: String): Member {
+        return join(username, password, nickname, "")
     }
 
     fun findByUsername(username: String): Member? {
@@ -91,5 +100,18 @@ class MemberService(
 
     fun findById(id: Long): Member? {
         return memberRepository.findById(id).orElse(null)
+    }
+
+    fun modifyOrJoin(username: String, nickname: String, profileImgUrl: String): Member {
+        val member = findByUsername(username)
+
+        return if (member == null) {
+            join(username, "", nickname, profileImgUrl)
+        } else {
+            member.nickname = nickname
+            member.profileImgUrl = profileImgUrl
+
+            memberRepository.save(member)
+        }
     }
 }

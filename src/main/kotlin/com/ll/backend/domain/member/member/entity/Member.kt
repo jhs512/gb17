@@ -18,7 +18,10 @@ class Member(
     var nickname: String,
 
     @Column(unique = true, length = 30)
-    var refreshToken: String
+    var refreshToken: String,
+
+    @Column(length = 100)
+    var profileImgUrl: String = ""
 ) : BaseTime() {
     constructor(
         id: Long,

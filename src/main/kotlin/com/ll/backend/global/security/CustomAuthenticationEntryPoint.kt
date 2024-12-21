@@ -1,6 +1,7 @@
 package com.ll.backend.global.security
 
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.base.Empty
 import com.ll.backend.standard.util.Ut
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -15,7 +16,7 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        val rsData: RsData<Void> = RsData("403-1", "로그인 후 이용해주세요.")
+        val rsData: RsData<Empty> = RsData("403-1", "로그인 후 이용해주세요.")
 
         response.contentType = "application/json;charset=UTF-8"
         response.status = rsData.statusCode

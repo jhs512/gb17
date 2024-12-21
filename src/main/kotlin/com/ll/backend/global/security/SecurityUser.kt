@@ -4,10 +4,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
+import org.springframework.security.oauth2.core.user.OAuth2User
 import java.time.LocalDateTime
 
 
-class SecurityUser : User {
+class SecurityUser : User, OAuth2User {
     constructor(
         id: Long,
         createDate: LocalDateTime,
@@ -33,5 +34,13 @@ class SecurityUser : User {
             this.password,
             this.authorities
         )
+    }
+
+    override fun getName(): String {
+        return this.username
+    }
+
+    override fun getAttributes(): MutableMap<String, Any> {
+        return mutableMapOf()
     }
 }

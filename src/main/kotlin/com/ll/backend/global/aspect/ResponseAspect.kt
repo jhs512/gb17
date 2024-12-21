@@ -37,7 +37,6 @@ class ResponseAspect(
             @annotation(org.springframework.web.bind.annotation.ResponseBody)
     """
     )
-    @Throws(Throwable::class)
     fun handleResponse(joinPoint: ProceedingJoinPoint): Any {
         val proceed = joinPoint.proceed()
 

@@ -6,6 +6,7 @@ import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
 import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.base.Empty
 import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.page.dto.PageDto
 import jakarta.validation.Valid
@@ -73,7 +74,7 @@ class ApiV1PostController(
 
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long): RsData<Void> {
+    fun delete(@PathVariable id: Long): RsData<Empty> {
         val post = postService.findById(id).getOrThrow()
 
         postService.checkPermissionToDelete(currentActor, post)
