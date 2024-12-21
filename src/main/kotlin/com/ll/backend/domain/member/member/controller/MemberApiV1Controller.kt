@@ -2,6 +2,7 @@ package com.ll.backend.domain.member.member.controller
 
 import com.ll.backend.domain.member.member.dto.MemberDto
 import com.ll.backend.domain.member.member.service.MemberService
+import com.ll.backend.global.exceptions.ServiceException
 import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.extensions.getOrThrow
 import jakarta.validation.Valid
@@ -52,7 +53,7 @@ class MemberApiV1Controller(
     fun login(
         @RequestBody @Valid reqBody: MemberLoginReqBody
     ): RsData<MemberDto> {
-        val member = memberService.findByUsername(reqBody.username).getOrThrow()
+        val member = memberService.findByUsername(reqBody.username) ?: throw ServiceException("401-1", "해당 회원은 존재하지 않습니다.")
         
         return RsData(
             "201-1",
