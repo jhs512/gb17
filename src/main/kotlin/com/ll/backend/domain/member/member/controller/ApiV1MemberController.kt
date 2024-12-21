@@ -5,9 +5,12 @@ import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.exceptions.ServiceException
 import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -81,5 +84,11 @@ class ApiV1MemberController(
                 refreshToken = member.refreshToken
             )
         )
+    }
+
+    @DeleteMapping("/logout")
+    fun logout(req: HttpServletRequest): RsData<Void> {
+        rq.removeAuthCookies()
+        return RsData("200-1", "로그아웃 되었습니다.")
     }
 }

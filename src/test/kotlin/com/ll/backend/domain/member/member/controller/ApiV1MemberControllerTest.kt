@@ -4,7 +4,9 @@ import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.util.Ut
+import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -223,6 +226,32 @@ class ApiV1MemberControllerTest @Autowired constructor(
                 assertThat(refreshTokenCookie.path).isEqualTo("/")
                 assertThat(refreshTokenCookie.isHttpOnly).isTrue()
                 assertThat(refreshTokenCookie.secure).isTrue()
+            }
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/members/logout")
+    fun t7() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                delete("/api/v1/members/logout")
+                    .cookie(
+                        Cookie("accessToken", "EMPTY"),
+                        Cookie("refreshToken", "user1")
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.resultCode").value("200-1"))
+            .andExpect(jsonPath("$.msg").value("로그아웃 되었습니다."))
+            .andExpect { result ->
+
+                assertThat(result.response.getCookie("accessToken")?.maxAge).isEqualTo(0)
+                assertThat(result.response.getCookie("refreshToken")?.maxAge).isEqualTo(0)
             }
     }
 }

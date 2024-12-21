@@ -1,7 +1,6 @@
 package com.ll.backend.domain.member.member.dto
 
 import com.ll.backend.domain.member.member.entity.Member
-import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
 
 data class MemberDto(
