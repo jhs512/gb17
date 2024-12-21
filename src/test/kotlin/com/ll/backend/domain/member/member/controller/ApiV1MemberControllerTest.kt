@@ -1,6 +1,8 @@
 package com.ll.backend.domain.member.member.controller
 
+import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.util.Ut
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -22,8 +24,9 @@ import org.springframework.transaction.annotation.Transactional
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-class ApiV1MemberApiV1ControllerTest @Autowired constructor(
-    private val mockMvc: MockMvc
+class ApiV1MemberControllerTest @Autowired constructor(
+    private val mockMvc: MockMvc,
+    private val memberService: MemberService
 ) {
     private fun bodyToRsData(resultActions: ResultActions): RsData<Map<String, *>> {
         val contentAsString = resultActions.andReturn().response.contentAsString
@@ -60,6 +63,9 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.resultCode").value("201-1"))
             .andExpect(jsonPath("$.msg").value("new유저님 환영합니다."))
             .andExpect(jsonPath("$.data.id").value(newPostId))
+            .andExpect(jsonPath("$.data.createDate").exists())
+            .andExpect(jsonPath("$.data.modifyDate").exists())
+            .andExpect(jsonPath("$.data.name").value("new유저"))
             .andExpect(jsonPath("$.data.nickname").value("new유저"))
     }
 
@@ -110,15 +116,19 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val rsData = bodyToRsData(resultActions)
-        val name = rsData.data["name"] as String
+        val memberUser = memberService.findByUsername("user1").getOrThrow()
 
         // THEN
         resultActions
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.resultCode").value("201-1"))
-            .andExpect(jsonPath("$.msg").value("${name}님 환영합니다."))
-            .andExpect(jsonPath("$.data.nickname").value("유저1"))
+            .andExpect(jsonPath("$.msg").value("${memberUser.name}님 환영합니다."))
+            .andExpect(jsonPath("$.data.id").value(memberUser.id))
+            .andExpect(jsonPath("$.data.createDate").exists())
+            .andExpect(jsonPath("$.data.modifyDate").exists())
+            .andExpect(jsonPath("$.data.name").value(memberUser.name))
+            .andExpect(jsonPath("$.data.accessToken").exists())
+            .andExpect(jsonPath("$.data.refreshToken").value(memberUser.refreshToken))
     }
 
     @Test
