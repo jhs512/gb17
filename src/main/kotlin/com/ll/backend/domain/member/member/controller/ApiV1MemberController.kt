@@ -21,6 +21,10 @@ class ApiV1MemberController(
     private val memberService: MemberService,
     private val rq: Rq
 ) {
+    val currentActor
+        get() = rq.actor
+
+
     data class MemberJoinReqBody(
         @field:NotBlank
         @field:NotNull
@@ -103,7 +107,7 @@ class ApiV1MemberController(
     @GetMapping("/me")
     @Transactional(readOnly = true)
     fun me(): RsData<MemberDto> {
-        val member = memberService.findById(rq.actor.id).getOrThrow()
+        val member = memberService.findById(currentActor.id).getOrThrow()
         return RsData("200-1", "OK", MemberDto(member))
     }
 }
