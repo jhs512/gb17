@@ -33,7 +33,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     private val postService: PostService,
     private val mockMvc: MockMvc
 ) {
-    private fun bodyMap(resultActions: ResultActions): RsData<Map<String, *>> {
+    private fun bodyToRsData(resultActions: ResultActions): RsData<Map<String, *>> {
         val contentAsString = resultActions.andReturn().response.contentAsString
         return Ut.json.toObj(contentAsString)
     }
@@ -162,7 +162,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val rsData = bodyMap(resultActions)
+        val rsData = bodyToRsData(resultActions)
         val newPostId = rsData.data["id"] as Int
 
         assertThat(newPostId).isGreaterThan(2)
@@ -325,7 +325,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val rsData = bodyMap(resultActions)
+        val rsData = bodyToRsData(resultActions)
         val newPostId = rsData.data["id"] as Int
 
         assertThat(newPostId).isGreaterThan(2)
