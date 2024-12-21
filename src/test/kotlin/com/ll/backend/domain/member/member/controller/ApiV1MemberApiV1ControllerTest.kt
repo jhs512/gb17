@@ -111,14 +111,13 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             .andDo(print())
 
         val rsData = bodyToRsData(resultActions)
-        val newPostId = rsData.data["id"] as Int
+        val name = rsData.data["name"] as String
 
         // THEN
         resultActions
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.resultCode").value("201-1"))
-            .andExpect(jsonPath("$.msg").value("${newPostId}번 회원이 로그인했습니다."))
-            .andExpect(jsonPath("$.data.id").value(newPostId))
+            .andExpect(jsonPath("$.msg").value("${name}님 환영합니다."))
             .andExpect(jsonPath("$.data.nickname").value("유저1"))
     }
 
