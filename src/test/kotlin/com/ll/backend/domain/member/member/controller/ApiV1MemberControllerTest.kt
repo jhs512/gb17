@@ -186,8 +186,24 @@ class ApiV1MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("POST /api/v1/members/login, check cross domain cookies")
+    @DisplayName("POST /api/v1/members/login, with no input username, 400")
     fun t6() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/members/login, check cross domain cookies")
+    fun t7() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -229,7 +245,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
     @Test
     @DisplayName("DELETE /api/v1/members/logout")
-    fun t7() {
+    fun t8() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -251,7 +267,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
     @Test
     @WithUserDetails("user1")
     @DisplayName("GET /api/v1/members/me")
-    fun t8() {
+    fun t9() {
         // WHEN
         val resultActions = mockMvc
             .perform(
