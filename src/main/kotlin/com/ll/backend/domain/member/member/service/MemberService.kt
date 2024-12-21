@@ -88,4 +88,8 @@ class MemberService(
             throw ServiceException("401-1", "비밀번호가 일치하지 않습니다.")
         }
     }
+
+    fun findById(id: Long): Member? {
+        return memberRepository.findById(id).orElse(null)
+    }
 }

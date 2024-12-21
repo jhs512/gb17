@@ -5,16 +5,14 @@ import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.exceptions.ServiceException
 import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.extensions.getOrThrow
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -90,5 +88,11 @@ class ApiV1MemberController(
     fun logout(req: HttpServletRequest): RsData<Void> {
         rq.removeAuthCookies()
         return RsData("200-1", "로그아웃 되었습니다.")
+    }
+
+    @GetMapping("/me")
+    fun me(): RsData<MemberDto> {
+        val member = memberService.findById(rq.actor.id).getOrThrow()
+        return RsData("200-1", "OK", MemberDto(member))
     }
 }
