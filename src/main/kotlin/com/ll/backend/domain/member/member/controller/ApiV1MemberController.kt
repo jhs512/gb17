@@ -3,6 +3,7 @@ package com.ll.backend.domain.member.member.controller
 import com.ll.backend.domain.member.member.dto.MemberDto
 import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.exceptions.ServiceException
+import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/members")
 @Validated
 class ApiV1MemberController(
-    private val memberService: MemberService
+    private val memberService: MemberService,
+    private val rq: Rq
 ) {
     data class MemberJoinReqBody(
         @NotBlank
@@ -41,6 +43,7 @@ class ApiV1MemberController(
         )
     }
 
+
     data class MemberLoginReqBody(
         @NotBlank
         val username: String,
@@ -63,6 +66,11 @@ class ApiV1MemberController(
             ?: throw ServiceException("401-1", "해당 회원은 존재하지 않습니다.")
 
         memberService.checkPasswordValidation(reqBody.password, member.password)
+
+        val accessToken = memberService.genAccessToken(member)
+        val refreshToken = member.refreshToken
+
+        rq.makeAuthCookies(accessToken, refreshToken)
 
         return RsData(
             "201-1",

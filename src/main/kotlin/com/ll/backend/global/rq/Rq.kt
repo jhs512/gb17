@@ -42,6 +42,11 @@ class Rq(
         SecurityContextHolder.getContext().authentication = securityUser.genAuthentication()
     }
 
+    fun makeAuthCookies(accessToken: String, refreshToken: String) {
+        setCrossDomainCookie("accessToken", accessToken)
+        setCrossDomainCookie("refreshToken", refreshToken)
+    }
+
     fun removeAuthCookies() {
         removeCrossDomainCookie("accessToken")
         removeCrossDomainCookie("refreshToken")
