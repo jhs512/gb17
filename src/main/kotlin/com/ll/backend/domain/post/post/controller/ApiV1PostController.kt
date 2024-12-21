@@ -1,11 +1,12 @@
 package com.ll.backend.domain.post.post.controller
 
-import com.ll.backend.domain.post.author.entity.PostAuthor
+import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.domain.post.post.dto.PostDto
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
 import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.page.dto.PageDto
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
@@ -22,10 +23,12 @@ class ApiV1PostController(
     private val rq: Rq,
     private val postService: PostService
 ) {
+    val currentActor by lazy { Author(rq.actor) }
+
     @GetMapping
     fun getItems(
         page: Int = 1,
-        @Min(1) @Max(AppConfig.basePageSize.toLong()) pageSize: Int = AppConfig.basePageSize
+        @Min(10) @Max(50) pageSize: Int = AppConfig.basePageSize
     ): PageDto<PostDto> {
         return PageDto(
             postService
@@ -40,8 +43,8 @@ class ApiV1PostController(
         @PathVariable id: Long
     ): PostDto {
         return postService.findById(id)
-            .map { PostDto(it) }
-            .get()
+            .getOrThrow()
+            .let { PostDto(it) }
     }
 
 
@@ -56,9 +59,9 @@ class ApiV1PostController(
     fun write(
         @RequestBody @Valid reqBody: PostWriteReqBody
     ): RsData<PostDto> {
-        postService.checkPermissionToWrite(PostAuthor(rq.actor))
+        postService.checkPermissionToWrite(currentActor)
 
-        val post = postService.write(PostAuthor(rq.actor), reqBody.title, reqBody.body, true)
+        val post = postService.write(currentActor, reqBody.title, reqBody.body, true)
 
         return RsData(
             "201-1",
@@ -70,9 +73,10 @@ class ApiV1PostController(
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): RsData<Void> {
-        val post = postService.findById(id).get()
+        val post = postService.findById(id)
+            .getOrThrow()
 
-        postService.checkPermissionToDelete(PostAuthor(rq.actor), post)
+        postService.checkPermissionToDelete(currentActor, post)
 
         postService.delete(post)
 
@@ -93,9 +97,9 @@ class ApiV1PostController(
         @PathVariable id: Long,
         @RequestBody @Valid reqBody: PostModifyReqBody
     ): RsData<PostDto> {
-        val post = postService.findById(id).get()
+        val post = postService.findById(id).getOrThrow()
 
-        postService.checkPermissionToModify(PostAuthor(rq.actor), post)
+        postService.checkPermissionToModify(Author(rq.actor), post)
 
         postService.modify(post, reqBody.title, reqBody.body)
 

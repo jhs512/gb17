@@ -10,7 +10,7 @@ import org.hibernate.annotations.Immutable
 @Entity
 @Immutable
 @Table(name = "member")
-class PostAuthor(
+class Author(
     @Column(name = "nickname")
     var name: String
 ) : BaseTime() {

@@ -12,7 +12,7 @@ class ServiceException(resultCode: String, msg: String) : RuntimeException("$res
         message!!.split(":", limit = 2).toTypedArray()[1].trim()
     }
 
-    fun getRsData(): RsData<Empty> {
-        return RsData(resultCode, msg)
+    val rsData by lazy {
+        RsData<Empty>(resultCode, msg)
     }
 }

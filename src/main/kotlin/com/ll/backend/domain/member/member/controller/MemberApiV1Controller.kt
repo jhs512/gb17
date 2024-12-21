@@ -2,9 +2,6 @@ package com.ll.backend.domain.member.member.controller
 
 import com.ll.backend.domain.member.member.dto.MemberDto
 import com.ll.backend.domain.member.member.service.MemberService
-import com.ll.backend.domain.post.author.entity.PostAuthor
-import com.ll.backend.domain.post.post.dto.PostDto
-import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
 import jakarta.validation.Valid

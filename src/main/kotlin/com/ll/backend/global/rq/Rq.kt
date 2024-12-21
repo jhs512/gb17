@@ -1,7 +1,6 @@
 package com.ll.backend.global.rq
 
 import com.ll.backend.domain.member.member.entity.Member
-import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.app.AppConfig
 import com.ll.backend.global.exceptions.ServiceException
 import com.ll.backend.global.security.SecurityUser
@@ -13,13 +12,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.context.annotation.RequestScope
 
-
 @RequestScope
 @Component
 class Rq(
     val req: HttpServletRequest,
-    val res: HttpServletResponse,
-    private val memberService: MemberService
+    val res: HttpServletResponse
 ) {
     val isLogin: Boolean by lazy {
         SecurityContextHolder.getContext()?.authentication?.isAuthenticated ?: false
@@ -31,11 +28,8 @@ class Rq(
     }
 
     val actor: Member by lazy {
-        memberService.findByUsername(user.username).orElseThrow {
-            ServiceException("403-1", "actor 객체 취득실패, 로그인이 필요합니다.")
-        }
+        Member(user.id, user.username)
     }
-
 
     fun setLogin(securityUser: SecurityUser) {
         SecurityContextHolder.getContext().authentication = securityUser.genAuthentication()

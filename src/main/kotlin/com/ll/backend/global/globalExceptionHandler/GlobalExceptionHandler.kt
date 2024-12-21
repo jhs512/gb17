@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException::class)
     fun handleException(e: ServiceException): ResponseEntity<RsData<Empty>> {
-        val rsData = e.getRsData()
-
         return ResponseEntity
-            .status(rsData.statusCode)
-            .body(rsData)
+            .status(e.rsData.statusCode)
+            .body(e.rsData)
     }
 
     @ExceptionHandler(NoSuchElementException::class)
