@@ -78,4 +78,10 @@ class MemberService(
             authorities.stream().map { role -> SimpleGrantedAuthority(role) }.toList()
         )
     }
+
+    fun validatePassword(inputPassword: String, userPassword: String) {
+        if (!passwordEncoder.matches(inputPassword, userPassword)) {
+            throw ServiceException("401-1", "비밀번호가 일치하지 않습니다.")
+        }
+    }
 }

@@ -54,7 +54,8 @@ class MemberApiV1Controller(
         @RequestBody @Valid reqBody: MemberLoginReqBody
     ): RsData<MemberDto> {
         val member = memberService.findByUsername(reqBody.username) ?: throw ServiceException("401-1", "해당 회원은 존재하지 않습니다.")
-        
+        memberService.validatePassword(reqBody.password, member.password)
+
         return RsData(
             "201-1",
             "${member.name}님 환영합니다.",
