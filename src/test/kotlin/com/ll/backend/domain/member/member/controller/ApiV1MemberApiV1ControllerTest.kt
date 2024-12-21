@@ -1,24 +1,18 @@
 package com.ll.backend.domain.member.member.controller
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.ll.backend.domain.member.member.service.MemberService
-import com.ll.backend.domain.post.post.entity.Post
-import com.ll.backend.domain.post.post.service.PostService
-import com.ll.backend.global.app.AppConfig
+import com.ll.backend.standard.util.Ut
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
-import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -29,13 +23,11 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("test")
 @Transactional
 class ApiV1MemberApiV1ControllerTest @Autowired constructor(
-    private val memberService: MemberService,
-    private val mockMvc: MockMvc,
-    private val objectMapper: ObjectMapper
+    private val mockMvc: MockMvc
 ) {
     private fun bodyMap(resultActions: ResultActions): Map<String, *> {
         val contentAsString = resultActions.andReturn().response.contentAsString
-        return objectMapper.readValue(contentAsString, object : TypeReference<Map<String, *>>() {})
+        return Ut.json.toObj(contentAsString, object : TypeReference<Map<String, *>>() {})
     }
 
     @Test
@@ -49,9 +41,9 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
                     .content(
                         """
                         {
-                            "username": "user3",
+                            "username": "newuser",
                             "password": "1234",
-                            "nickname": "유저3"
+                            "nickname": "new유저"
                         }
                         """.trimIndent()
                     )
@@ -66,14 +58,42 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
         resultActions
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.resultCode").value("201-1"))
-            .andExpect(jsonPath("$.msg").value("${newPostId}번 회원이 생성되었습니다."))
+            .andExpect(jsonPath("$.msg").value("new유저님 환영합니다."))
             .andExpect(jsonPath("$.data.id").value(newPostId))
-            .andExpect(jsonPath("$.data.nickname").value("유저3"))
+            .andExpect(jsonPath("$.data.nickname").value("new유저"))
+    }
+
+
+    @Test
+    @DisplayName("POST /api/v1/members/join conflict")
+    fun t2() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/join")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user1",
+                            "password": "1234",
+                            "nickname": "new유저"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isConflict)
+            .andExpect(jsonPath("$.resultCode").value("409-1"))
+            .andExpect(jsonPath("$.msg").value("이미 존재하는 아이디입니다."))
     }
 
     @Test
     @DisplayName("POST /api/v1/members/login")
-    fun t2() {
+    fun t3() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -101,6 +121,8 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data.id").value(newPostId))
             .andExpect(jsonPath("$.data.nickname").value("유저1"))
     }
+
+
 //    @Test
 //    @DisplayName("GET /api/v1/posts/2")
 //    fun t2() {

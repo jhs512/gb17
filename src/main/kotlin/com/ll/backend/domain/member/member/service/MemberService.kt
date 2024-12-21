@@ -8,7 +8,7 @@ import com.ll.backend.global.security.SecurityUser
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.*
+import java.time.LocalDateTime
 
 
 @Service
@@ -22,7 +22,12 @@ class MemberService(
     }
 
     fun join(username: String, password: String, nickname: String): Member {
-        findByUsername(username).ifPresent { throw ServiceException("400-1", "이미 존재하는 회원입니다.") }
+        findByUsername(username)?.let {
+            throw ServiceException(
+                "409-1",
+                "이미 존재하는 아이디입니다."
+            )
+        }
 
         val member = Member(
             username = username,
@@ -34,8 +39,8 @@ class MemberService(
         return memberRepository.save(member)
     }
 
-    fun findByUsername(username: String): Optional<Member> {
-        return memberRepository.findByUsername(username)
+    fun findByUsername(username: String): Member? {
+        return memberRepository.findByUsername(username).orElse(null)
     }
 
     fun validateToken(accessToken: String): Boolean {
@@ -61,9 +66,13 @@ class MemberService(
         val id = (payloadBody["id"] as Int).toLong()
         val username = payloadBody["username"] as String
         val authorities = payloadBody["authorities"] as List<String>
+        val createDate = LocalDateTime.now()
+        val modifyDate = LocalDateTime.now()
 
         return SecurityUser(
             id,
+            createDate,
+            modifyDate,
             username,
             "",
             authorities.stream().map { role -> SimpleGrantedAuthority(role) }.toList()

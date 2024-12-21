@@ -1,10 +1,11 @@
 package com.ll.backend.domain.post.post.controller
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.ll.backend.domain.post.post.entity.Post
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
+import com.ll.backend.standard.extensions.getOrThrow
+import com.ll.backend.standard.util.Ut
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -30,12 +31,15 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ApiV1PostControllerTest @Autowired constructor(
     private val postService: PostService,
-    private val mockMvc: MockMvc,
-    private val objectMapper: ObjectMapper
+    private val mockMvc: MockMvc
 ) {
     private fun bodyMap(resultActions: ResultActions): Map<String, *> {
-        val contentAsString = resultActions.andReturn().response.contentAsString
-        return objectMapper.readValue(contentAsString, object : TypeReference<Map<String, *>>() {})
+        val contentAsString = resultActions
+            .andReturn()
+            .response
+            .contentAsString
+
+        return Ut.json.toObj(contentAsString, object : TypeReference<Map<String, *>>() {})
     }
 
     @Test
@@ -83,7 +87,6 @@ class ApiV1PostControllerTest @Autowired constructor(
         val resultActions = mockMvc
             .perform(
                 get("/api/v1/posts")
-                    .contentType(MediaType.APPLICATION_JSON)
             )
             .andDo(print())
 
@@ -118,7 +121,6 @@ class ApiV1PostControllerTest @Autowired constructor(
                 get("/api/v1/posts")
                     .param("page", "2")
                     .param("pageSize", "1")
-                    .contentType(MediaType.APPLICATION_JSON)
             )
             .andDo(print())
 
@@ -165,7 +167,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andDo(print())
 
         val body = bodyMap(resultActions)
-        val newPostId = (body["data"] as Map<String, *>)["id"] as Int
+        val newPostId = (body["data"] as Map<String, *>)
+            .let { it["id"] as Int }
 
         assertThat(newPostId).isGreaterThan(2)
 
@@ -187,7 +190,6 @@ class ApiV1PostControllerTest @Autowired constructor(
         val resultActions = mockMvc
             .perform(
                 delete("/api/v1/posts/1")
-                    .contentType(MediaType.APPLICATION_JSON)
             )
             .andDo(print())
 
@@ -197,7 +199,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.resultCode").value("200-1"))
             .andExpect(jsonPath("$.msg").value("1번 글이 삭제되었습니다."))
 
-        assertThat(postService.findById(1).isEmpty).isTrue()
+        assertThat(postService.findById(1)).isNull()
     }
 
     @Test
@@ -229,7 +231,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data.title").value("제목 수정"))
             .andExpect(jsonPath("$.data.body").value("내용 수정"))
 
-        val post = postService.findById(1).get()
+        val post = postService.findById(1).getOrThrow()
         assertThat(post.title).isEqualTo("제목 수정")
         assertThat(post.body).isEqualTo("내용 수정")
     }
@@ -278,7 +280,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.resultCode").value("403-1"))
             .andExpect(jsonPath("$.msg").value("글의 작성자만 삭제할 수 있습니다."))
 
-        assertThat(postService.findById(1)).isPresent
+        assertThat(postService.findById(1)).isNotNull
     }
 
     @Test

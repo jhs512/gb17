@@ -23,12 +23,13 @@ class ApiV1PostController(
     private val rq: Rq,
     private val postService: PostService
 ) {
-    val currentActor by lazy { Author(rq.actor) }
+    val currentActor
+        get() = Author(rq.actor)
 
     @GetMapping
     fun getItems(
         page: Int = 1,
-        @Min(10) @Max(50) pageSize: Int = AppConfig.basePageSize
+        @Min(1) @Max(50) pageSize: Int = AppConfig.basePageSize
     ): PageDto<PostDto> {
         return PageDto(
             postService
@@ -73,8 +74,7 @@ class ApiV1PostController(
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): RsData<Void> {
-        val post = postService.findById(id)
-            .getOrThrow()
+        val post = postService.findById(id).getOrThrow()
 
         postService.checkPermissionToDelete(currentActor, post)
 

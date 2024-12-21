@@ -4,6 +4,7 @@ import com.ll.backend.global.jpa.entity.BaseTime
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import org.springframework.security.core.GrantedAuthority
+import java.time.LocalDateTime
 
 @Entity
 class Member(
@@ -19,9 +20,19 @@ class Member(
     @Column(unique = true, length = 30)
     var refreshToken: String
 ) : BaseTime() {
-    constructor(id: Long, username: String) : this(username, "", "", "") {
+    constructor(
+        id: Long,
+        createDate: LocalDateTime,
+        modifyDate: LocalDateTime,
+        username: String,
+    ) : this(username, "", "", "") {
         this.id = id
+        this.createDate = createDate
+        this.modifyDate = modifyDate
     }
+
+    val name
+        get() = nickname
 
     val authorities: Collection<GrantedAuthority>
         get() {
