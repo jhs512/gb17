@@ -44,28 +44,13 @@ class Rq(
     fun setLogout() {
         removeCrossDomainCookie("accessToken")
         removeCrossDomainCookie("refreshToken")
-        SecurityContextHolder.getContext().authentication = null
-    }
-
-    fun setCookie(name: String?, value: String?) {
-        val cookie = Cookie(name, value)
-        cookie.path = "/"
-        cookie.domain = AppConfig.siteCookieDomain
-        res.addCookie(cookie)
-    }
-
-    fun setCookie(name: String?, value: String?, maxAge: Int) {
-        val cookie = Cookie(name, value)
-        cookie.path = "/"
-        cookie.maxAge = maxAge
-        res.addCookie(cookie)
     }
 
     private fun getSiteCookieDomain(): String? {
-        var cookieDomain: String = AppConfig.siteCookieDomain
+        var cookieDomain = AppConfig.siteCookieDomain
 
         if (cookieDomain != "localhost") {
-            return (".$cookieDomain").also { cookieDomain = it }
+            return ".$cookieDomain"
         }
 
         return null
@@ -84,8 +69,6 @@ class Rq(
     }
 
     fun removeCrossDomainCookie(name: String) {
-        removeCookie(name)
-
         val cookie = ResponseCookie.from(name, "")
             .path("/")
             .maxAge(0)
@@ -98,15 +81,7 @@ class Rq(
     }
 
     fun getCookie(name: String): Cookie? {
-        val cookies = req.cookies ?: return null
-
-        for (cookie in cookies) {
-            if (cookie.name.equals(name)) {
-                return cookie
-            }
-        }
-
-        return null
+        return req.cookies?.find { it.name == name }
     }
 
     fun getCookieValue(name: String, defaultValue: String?): String? {
@@ -114,19 +89,4 @@ class Rq(
 
         return cookie.value
     }
-
-    private fun getCookieAsLong(name: String, defaultValue: Int): Long {
-        val value = getCookieValue(name, null) ?: return defaultValue.toLong()
-
-        return value.toLong()
-    }
-
-    fun removeCookie(name: String) {
-        val cookie = getCookie(name) ?: return
-
-        cookie.path = "/"
-        cookie.maxAge = 0
-        res.addCookie(cookie)
-    }
-
 }
