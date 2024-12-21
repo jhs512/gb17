@@ -19,6 +19,10 @@ class Member(
     @Column(unique = true, length = 30)
     var refreshToken: String
 ) : BaseTime() {
+    constructor(id: Long, username: String) : this(username, "", "", "") {
+        this.id = id
+    }
+
     val authorities: Collection<GrantedAuthority>
         get() {
             if (username == "admin") {

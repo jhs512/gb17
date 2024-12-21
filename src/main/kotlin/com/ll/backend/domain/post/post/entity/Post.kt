@@ -1,6 +1,6 @@
 package com.ll.backend.domain.post.post.entity
 
-import com.ll.backend.domain.post.author.entity.PostAuthor
+import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.global.jpa.entity.BaseTime
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne
 @Entity
 class Post(
     @ManyToOne(fetch = LAZY)
-    var author: PostAuthor,
+    var author: Author,
 
     @Column(length = 100)
     var title: String,

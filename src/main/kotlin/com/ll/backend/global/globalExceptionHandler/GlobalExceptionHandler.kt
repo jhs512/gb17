@@ -2,6 +2,7 @@ package com.ll.backend.global.globalExceptionHandler
 
 import com.ll.backend.global.exceptions.ServiceException
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.base.Empty
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -11,16 +12,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 @ControllerAdvice
 class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException::class)
-    fun handleException(e: ServiceException): ResponseEntity<RsData<Void>> {
-        val rsData = e.getRsData()
-
+    fun handleException(e: ServiceException): ResponseEntity<RsData<Empty>> {
         return ResponseEntity
-            .status(rsData.statusCode)
-            .body(rsData)
+            .status(e.rsData.statusCode)
+            .body(e.rsData)
     }
 
     @ExceptionHandler(NoSuchElementException::class)
-    fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Void>> {
+    fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Empty>> {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(

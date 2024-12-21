@@ -1,7 +1,7 @@
 package com.ll.backend.global.initData
 
 import com.ll.backend.domain.member.member.service.MemberService
-import com.ll.backend.domain.post.author.entity.PostAuthor
+import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,7 +52,7 @@ class BaseInitData(
         val memberUser1 = memberService.findByUsername("user1").get()
         val memberUser2 = memberService.findByUsername("user2").get()
 
-        postService.write(PostAuthor(memberUser1), "안녕하세요.", "반갑습니다.", true)
-        postService.write(PostAuthor(memberUser2), "Hello.", "Nice to meet you.", true)
+        postService.write(Author(memberUser1), "안녕하세요.", "반갑습니다.", true)
+        postService.write(Author(memberUser2), "Hello.", "Nice to meet you.", true)
     }
 }

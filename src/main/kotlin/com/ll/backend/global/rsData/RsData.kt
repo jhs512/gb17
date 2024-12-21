@@ -1,9 +1,7 @@
 package com.ll.backend.global.rsData
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.ll.backend.standard.base.Empty
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 data class RsData<T>(
     val resultCode: String,
     val msg: String,
