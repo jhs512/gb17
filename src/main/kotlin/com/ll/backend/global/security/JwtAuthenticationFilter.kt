@@ -54,7 +54,7 @@ class JwtAuthenticationFilter(
 
         if (!isEmptyAccessToken(accessToken)) {
             accessToken = refreshAccessTokenIfNeeded(accessToken, refreshToken)
-            val securityUser = memberService.getUserFromAccessToken(accessToken)
+            val securityUser = memberService.getSecurityUserFromAccessToken(accessToken)
             rq.setLogin(securityUser)
         } else if (refreshToken.isNotBlank()) {
             authenticateWithRefreshToken(refreshToken)
@@ -67,7 +67,7 @@ class JwtAuthenticationFilter(
         if (!isEmptyAccessToken(accessToken)) {
             val refreshToken = rq.getCookieValue("refreshToken", "") ?: ""
             val validAccessToken = refreshAccessTokenIfNeeded(accessToken, refreshToken)
-            val securityUser = memberService.getUserFromAccessToken(validAccessToken)
+            val securityUser = memberService.getSecurityUserFromAccessToken(validAccessToken)
             rq.setLogin(securityUser)
         } else {
             val refreshToken = rq.getCookieValue("refreshToken", "") ?: ""
@@ -88,16 +88,8 @@ class JwtAuthenticationFilter(
     }
 
     private fun authenticateWithRefreshToken(refreshToken: String) {
-        memberService.findByRefreshToken(refreshToken)?.let { member ->
-            val securityUser = SecurityUser(
-                member.id,
-                member.createDate,
-                member.modifyDate,
-                member.username,
-                member.password,
-                member.authorities
-            )
-            rq.setLogin(securityUser)
+        memberService.genSecurityUserByRefreshToken(refreshToken)?.let {
+            rq.setLogin(it)
         }
     }
 }

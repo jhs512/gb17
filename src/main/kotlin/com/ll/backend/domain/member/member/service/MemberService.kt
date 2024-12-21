@@ -72,7 +72,7 @@ class MemberService(
         return RsData("201-1", "엑세스 토큰이 생성되었습니다.", accessToken)
     }
 
-    fun getUserFromAccessToken(accessToken: String): SecurityUser {
+    fun getSecurityUserFromAccessToken(accessToken: String): SecurityUser {
         val payloadBody = authTokenService.getDataFrom(accessToken)
 
         val id = (payloadBody["id"] as Int).toLong()
@@ -119,5 +119,18 @@ class MemberService(
 
     fun findByRefreshToken(refreshToken: String): Member? {
         return memberRepository.findByRefreshToken(refreshToken)
+    }
+
+    fun genSecurityUserByRefreshToken(refreshToken: String): SecurityUser? {
+        return findByRefreshToken(refreshToken)?.let { member ->
+            SecurityUser(
+                member.id,
+                member.createDate,
+                member.modifyDate,
+                member.username,
+                member.password,
+                member.authorities
+            )
+        }
     }
 }
