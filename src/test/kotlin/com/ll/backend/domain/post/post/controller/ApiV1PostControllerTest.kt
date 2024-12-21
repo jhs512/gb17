@@ -339,4 +339,58 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data.title").value("글 제목"))
             .andExpect(jsonPath("$.data.body").value("글 내용"))
     }
+
+    @Test
+    @WithUserDetails("user1")
+    @DisplayName("POST /api/v1/posts/2, no Permission to modify, 403")
+    fun t12() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                put("/api/v1/posts/2")
+                    .header("Authorization", "Bearer user1 EMPTY")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "글 제목 수정",
+                            "body": "글 내용 수정"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+        // THEN
+        resultActions
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.msg").value("글의 작성자만 수정할 수 있습니다."))
+    }
+
+    @Test
+    @WithUserDetails("user1")
+    @DisplayName("POST /api/v1/posts/2, no Permission to delete, 403")
+    fun t13() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                delete("/api/v1/posts/2")
+                    .header("Authorization", "Bearer user1 EMPTY")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "글 제목 수정",
+                            "body": "글 내용 수정"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+        // THEN
+        resultActions
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.msg").value("글의 작성자만 삭제할 수 있습니다."))
+    }
 }
