@@ -1,9 +1,9 @@
 package com.ll.backend.domain.post.post.controller
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.ll.backend.domain.post.post.entity.Post
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
+import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.util.Ut
 import org.assertj.core.api.Assertions.assertThat
@@ -33,13 +33,9 @@ class ApiV1PostControllerTest @Autowired constructor(
     private val postService: PostService,
     private val mockMvc: MockMvc
 ) {
-    private fun bodyMap(resultActions: ResultActions): Map<String, *> {
-        val contentAsString = resultActions
-            .andReturn()
-            .response
-            .contentAsString
-
-        return Ut.json.toObj(contentAsString, object : TypeReference<Map<String, *>>() {})
+    private fun bodyMap(resultActions: ResultActions): RsData<Map<String, *>> {
+        val contentAsString = resultActions.andReturn().response.contentAsString
+        return Ut.json.toObj(contentAsString)
     }
 
     @Test
@@ -166,9 +162,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val body = bodyMap(resultActions)
-        val newPostId = (body["data"] as Map<String, *>)
-            .let { it["id"] as Int }
+        val rsData = bodyMap(resultActions)
+        val newPostId = rsData.data["id"] as Int
 
         assertThat(newPostId).isGreaterThan(2)
 
@@ -330,8 +325,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val body = bodyMap(resultActions)
-        val newPostId = (body["data"] as Map<String, *>)["id"] as Int
+        val rsData = bodyMap(resultActions)
+        val newPostId = rsData.data["id"] as Int
 
         assertThat(newPostId).isGreaterThan(2)
 

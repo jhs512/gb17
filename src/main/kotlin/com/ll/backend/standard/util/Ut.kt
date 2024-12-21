@@ -10,8 +10,8 @@ class Ut {
                 return AppConfig.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
             }
 
-            fun <T> toObj(jsonStr: String, typeReference: TypeReference<T>): T {
-                return AppConfig.objectMapper.readValue(jsonStr, typeReference)
+            inline fun <reified T> toObj(jsonStr: String): T {
+                return AppConfig.objectMapper.readValue(jsonStr, object : TypeReference<T>() {})
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.ll.backend.domain.member.member.controller
 
-import com.fasterxml.jackson.core.type.TypeReference
+import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.util.Ut
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional
 class ApiV1MemberApiV1ControllerTest @Autowired constructor(
     private val mockMvc: MockMvc
 ) {
-    private fun bodyMap(resultActions: ResultActions): Map<String, *> {
+    private fun bodyMap(resultActions: ResultActions): RsData<Map<String, *>> {
         val contentAsString = resultActions.andReturn().response.contentAsString
-        return Ut.json.toObj(contentAsString, object : TypeReference<Map<String, *>>() {})
+        return Ut.json.toObj(contentAsString)
     }
 
     @Test
@@ -50,8 +50,8 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             )
             .andDo(print())
 
-        val body = bodyMap(resultActions)
-        val newPostId = (body["data"] as Map<String, *>)["id"] as Int
+        val rsData = bodyMap(resultActions)
+        val newPostId = rsData.data["id"] as Int
         assertThat(newPostId).isGreaterThan(4)
 
         // THEN
