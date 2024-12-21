@@ -121,6 +121,57 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data.nickname").value("유저1"))
     }
 
+    @Test
+    @DisplayName("POST /api/v1/members/login, with wrong username, 401")
+    fun t4() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user0",
+                            "password": "1234"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isUnauthorized)
+            .andExpect(jsonPath("$.resultCode").value("401-1"))
+            .andExpect(jsonPath("$.msg").value("해당 회원은 존재하지 않습니다."))
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/members/login, with wrong password, 401")
+    fun t5() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user1",
+                            "password": "12345"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isUnauthorized)
+            .andExpect(jsonPath("$.resultCode").value("401-1"))
+            .andExpect(jsonPath("$.msg").value("비밀번호가 일치하지 않습니다."))
+    }
 
 //    @Test
 //    @DisplayName("GET /api/v1/posts/2")
