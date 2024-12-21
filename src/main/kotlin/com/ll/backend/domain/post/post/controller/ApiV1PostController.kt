@@ -104,7 +104,7 @@ class ApiV1PostController(
     ): RsData<PostDto> {
         val post = postService.findById(id).getOrThrow()
 
-        postService.checkPermissionToModify(Author(rq.actor), post)
+        postService.checkPermissionToModify(currentActor, post)
 
         postService.modify(post, reqBody.title, reqBody.body)
 

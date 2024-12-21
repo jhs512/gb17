@@ -116,4 +116,8 @@ class MemberService(
             member
         }
     }
+
+    fun findByRefreshToken(refreshToken: String): Member? {
+        return memberRepository.findByRefreshToken(refreshToken)
+    }
 }

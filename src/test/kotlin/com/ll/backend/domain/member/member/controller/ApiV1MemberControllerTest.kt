@@ -4,6 +4,7 @@ import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.rsData.RsData
 import com.ll.backend.standard.extensions.getOrThrow
 import com.ll.backend.standard.util.Ut
+import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -339,6 +340,59 @@ class ApiV1MemberControllerTest @Autowired constructor(
         val resultActions = mockMvc
             .perform(
                 get("/api/v1/members/me")
+            )
+            .andDo(print())
+
+        val memberUser = memberService.findByUsername("user1").getOrThrow()
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.resultCode").value("200-1"))
+            .andExpect(jsonPath("$.msg").value("OK"))
+            .andExpect(jsonPath("$.data.id").value(memberUser.id))
+            .andExpect(jsonPath("$.data.createDate").exists())
+            .andExpect(jsonPath("$.data.modifyDate").exists())
+            .andExpect(jsonPath("$.data.name").value(memberUser.name))
+            .andExpect(jsonPath("$.data.nickname").value(memberUser.name))
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/members/me, with authorization header")
+    fun t12() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                get("/api/v1/members/me")
+                    .header("Authorization", "Bearer user1 EMPTY")
+            )
+            .andDo(print())
+
+        val memberUser = memberService.findByUsername("user1").getOrThrow()
+
+        // THEN
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.resultCode").value("200-1"))
+            .andExpect(jsonPath("$.msg").value("OK"))
+            .andExpect(jsonPath("$.data.id").value(memberUser.id))
+            .andExpect(jsonPath("$.data.createDate").exists())
+            .andExpect(jsonPath("$.data.modifyDate").exists())
+            .andExpect(jsonPath("$.data.name").value(memberUser.name))
+            .andExpect(jsonPath("$.data.nickname").value(memberUser.name))
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/members/me, with authorization cookies")
+    fun t13() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                get("/api/v1/members/me")
+                    .cookie(
+                        Cookie("refreshToken", "user1"),
+                        Cookie("accessToken", "EMPTY"),
+                    )
             )
             .andDo(print())
 

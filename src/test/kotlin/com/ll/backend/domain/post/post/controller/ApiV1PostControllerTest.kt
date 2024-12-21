@@ -306,49 +306,13 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("POST /api/v1/posts, with Authorization header(refreshToken + ' ' + accessToken), 200")
+    @WithUserDetails("user1")
+    @DisplayName("POST /api/v1/posts/2, no Permission to modify, 403")
     fun t11() {
         // WHEN
         val resultActions = mockMvc
             .perform(
-                post("/api/v1/posts")
-                    .header("Authorization", "Bearer user1 EMPTY")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                        {
-                            "title": "글 제목",
-                            "body": "글 내용"
-                        }
-                        """.trimIndent()
-                    )
-            )
-            .andDo(print())
-
-        val rsData = bodyToRsData(resultActions)
-        val newPostId = rsData.data["id"] as Int
-
-        assertThat(newPostId).isGreaterThan(2)
-
-        // THEN
-        resultActions
-            .andExpect(status().isCreated)
-            .andExpect(jsonPath("$.resultCode").value("201-1"))
-            .andExpect(jsonPath("$.msg").value("${newPostId}번 글이 작성되었습니다."))
-            .andExpect(jsonPath("$.data.id").value(newPostId))
-            .andExpect(jsonPath("$.data.title").value("글 제목"))
-            .andExpect(jsonPath("$.data.body").value("글 내용"))
-    }
-
-    @Test
-    @WithUserDetails("user1")
-    @DisplayName("POST /api/v1/posts/2, no Permission to modify, 403")
-    fun t12() {
-        // WHEN
-        val resultActions = mockMvc
-            .perform(
                 put("/api/v1/posts/2")
-                    .header("Authorization", "Bearer user1 EMPTY")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -370,12 +334,11 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @WithUserDetails("user1")
     @DisplayName("POST /api/v1/posts/2, no Permission to delete, 403")
-    fun t13() {
+    fun t12() {
         // WHEN
         val resultActions = mockMvc
             .perform(
                 delete("/api/v1/posts/2")
-                    .header("Authorization", "Bearer user1 EMPTY")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -387,6 +350,7 @@ class ApiV1PostControllerTest @Autowired constructor(
                     )
             )
             .andDo(print())
+
         // THEN
         resultActions
             .andExpect(status().isForbidden)
