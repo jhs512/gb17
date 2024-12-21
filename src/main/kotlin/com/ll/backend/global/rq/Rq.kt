@@ -28,14 +28,21 @@ class Rq(
     }
 
     val actor: Member by lazy {
-        Member(user.id, user.username)
+        val member = Member(
+            user.id,
+            user.createDate,
+            user.modifyDate,
+            user.username
+        )
+
+        return@lazy member
     }
 
     fun setLogin(securityUser: SecurityUser) {
         SecurityContextHolder.getContext().authentication = securityUser.genAuthentication()
     }
 
-    fun setLogout() {
+    fun removeAuthCookies() {
         removeCrossDomainCookie("accessToken")
         removeCrossDomainCookie("refreshToken")
     }

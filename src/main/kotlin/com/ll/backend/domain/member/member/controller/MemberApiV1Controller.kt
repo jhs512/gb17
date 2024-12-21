@@ -2,7 +2,6 @@ package com.ll.backend.domain.member.member.controller
 
 import com.ll.backend.domain.member.member.dto.MemberDto
 import com.ll.backend.domain.member.member.service.MemberService
-import com.ll.backend.global.rq.Rq
 import com.ll.backend.global.rsData.RsData
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -17,10 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/members")
 @Validated
 class MemberApiV1Controller(
-    private val rq: Rq,
     private val memberService: MemberService
 ) {
-
     data class MemberJoinReqBody(
         @NotBlank
         val username: String,
@@ -34,12 +31,11 @@ class MemberApiV1Controller(
     fun join(
         @RequestBody @Valid reqBody: MemberJoinReqBody
     ): RsData<MemberDto> {
-
         val member = memberService.join(reqBody.username, reqBody.password, reqBody.nickname);
 
         return RsData(
             "201-1",
-            "${member.id}번 회원이 생성되었습니다.",
+            "${member.name}님 환영합니다.",
             MemberDto(member)
         )
     }

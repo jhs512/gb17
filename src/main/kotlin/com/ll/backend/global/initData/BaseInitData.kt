@@ -4,6 +4,7 @@ import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
+import com.ll.backend.standard.extensions.getOrThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -49,8 +50,8 @@ class BaseInitData(
     fun work2() {
         if (postService.count() > 0) return
 
-        val memberUser1 = memberService.findByUsername("user1").get()
-        val memberUser2 = memberService.findByUsername("user2").get()
+        val memberUser1 = memberService.findByUsername("user1").getOrThrow()
+        val memberUser2 = memberService.findByUsername("user2").getOrThrow()
 
         postService.write(Author(memberUser1), "안녕하세요.", "반갑습니다.", true)
         postService.write(Author(memberUser2), "Hello.", "Nice to meet you.", true)
