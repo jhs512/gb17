@@ -43,6 +43,10 @@ class MemberService(
         return memberRepository.findByUsername(username).orElse(null)
     }
 
+    fun genAccessToken(member: Member): String {
+        return authTokenService.genAccessToken(member);
+    }
+
     fun validateToken(accessToken: String): Boolean {
         return authTokenService.validateToken(accessToken)
     }

@@ -48,10 +48,16 @@ class ApiV1MemberController(
         val password: String,
     )
 
+    data class MemberLoginResBody(
+        val item: MemberDto,
+        val accessToken: String,
+        val refreshToken: String,
+    )
+
     @PostMapping("/login")
     fun login(
         @RequestBody @Valid reqBody: MemberLoginReqBody
-    ): RsData<MemberDto> {
+    ): RsData<MemberLoginResBody> {
         val member = memberService
             .findByUsername(reqBody.username)
             ?: throw ServiceException("401-1", "해당 회원은 존재하지 않습니다.")
@@ -61,7 +67,11 @@ class ApiV1MemberController(
         return RsData(
             "201-1",
             "${member.name}님 환영합니다.",
-            MemberDto(member)
+            MemberLoginResBody(
+                item = MemberDto(member),
+                accessToken = memberService.genAccessToken(member),
+                refreshToken = member.refreshToken
+            )
         )
     }
 }
