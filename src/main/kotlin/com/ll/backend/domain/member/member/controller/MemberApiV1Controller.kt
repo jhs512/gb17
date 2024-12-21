@@ -1,8 +1,12 @@
 package com.ll.backend.domain.member.member.controller
 
 import com.ll.backend.domain.member.member.dto.MemberDto
+import com.ll.backend.domain.member.member.entity.Member
+import com.ll.backend.domain.member.member.service.AuthTokenService
 import com.ll.backend.domain.member.member.service.MemberService
 import com.ll.backend.global.rsData.RsData
+import com.ll.backend.standard.base.Empty
+import com.ll.backend.standard.extensions.getOrThrow
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.validation.annotation.Validated
@@ -40,4 +44,23 @@ class MemberApiV1Controller(
         )
     }
 
+    data class MemberLoginReqBody(
+        @NotBlank
+        val username: String,
+        @NotBlank
+        val password: String,
+    )
+
+    @PostMapping("/login")
+    fun login(
+        @RequestBody @Valid reqBody: MemberLoginReqBody
+    ): RsData<MemberDto> {
+
+        val member = memberService.findByUsername(reqBody.username).getOrThrow()
+        return RsData(
+            "201-1",
+            "${member.name}님 환영합니다.",
+            MemberDto(member)
+        )
+    }
 }

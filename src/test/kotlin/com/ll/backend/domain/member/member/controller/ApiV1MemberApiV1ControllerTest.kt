@@ -63,6 +63,66 @@ class ApiV1MemberApiV1ControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data.nickname").value("new유저"))
     }
 
+
+    @Test
+    @DisplayName("POST /api/v1/members/join conflict")
+    fun t2() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/join")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user1",
+                            "password": "1234",
+                            "nickname": "new유저"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isConflict)
+            .andExpect(jsonPath("$.resultCode").value("409-1"))
+            .andExpect(jsonPath("$.msg").value("이미 존재하는 아이디입니다."))
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/members/login")
+    fun t3() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/members/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "username": "user1",
+                            "password": "1234"
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        val body = bodyMap(resultActions)
+        val newPostId = (body["data"] as Map<String, *>)["id"] as Int
+
+        // THEN
+        resultActions
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.resultCode").value("201-1"))
+            .andExpect(jsonPath("$.msg").value("${newPostId}번 회원이 로그인했습니다."))
+            .andExpect(jsonPath("$.data.id").value(newPostId))
+            .andExpect(jsonPath("$.data.nickname").value("유저1"))
+    }
+
+
 //    @Test
 //    @DisplayName("GET /api/v1/posts/2")
 //    fun t2() {
