@@ -19,6 +19,6 @@ data class PostDto(
         actorId = post.author.id,
         authorName = post.author.name,
         title = post.title,
-        body = post.body
+        body = post.body.content
     )
 }

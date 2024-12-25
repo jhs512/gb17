@@ -104,7 +104,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             resultActions
                 .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
                 .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
-                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body))
+                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body.content))
         }
     }
 
@@ -138,7 +138,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             resultActions
                 .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
                 .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
-                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body))
+                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body.content))
         }
     }
 
@@ -228,7 +228,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
         val post = postService.findById(1).getOrThrow()
         assertThat(post.title).isEqualTo("제목 수정")
-        assertThat(post.body).isEqualTo("내용 수정")
+        assertThat(post.body.content).isEqualTo("내용 수정")
     }
 
     @Test

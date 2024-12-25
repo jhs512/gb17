@@ -2,6 +2,7 @@ package com.ll.backend.domain.post.post.service
 
 import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.domain.post.post.entity.Post
+import com.ll.backend.domain.post.post.entity.PostBody
 import com.ll.backend.domain.post.post.repository.PostRepository
 import com.ll.backend.global.exceptions.ServiceException
 import org.springframework.data.domain.Page
@@ -22,7 +23,19 @@ class PostService(
     }
 
     fun write(author: Author, title: String, body: String, published: Boolean = false): Post {
-        return postRepository.save(Post(author = author, title = title, body = body, published = published))
+        val post = Post(
+            author = author,
+            title = title,
+            published = published
+        )
+
+        post.body = PostBody(
+            id = post.id,
+            post = post,
+            content = body
+        )
+
+        return postRepository.save(post)
     }
 
     fun findByPublishedPaged(published: Boolean, page: Int, pageSize: Int): Page<Post> {
@@ -37,7 +50,7 @@ class PostService(
 
     fun modify(post: Post, title: String, body: String): Post {
         post.title = title
-        post.body = body
+        post.body.content = body
 
         return post
     }
