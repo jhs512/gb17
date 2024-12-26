@@ -54,7 +54,7 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.title").value("안녕하세요."))
-            .andExpect(jsonPath("$.content").doesNotExist())
+            .andExpect(jsonPath("$.content").value("반갑습니다."))
             .andExpect(jsonPath("$.published").value(true))
     }
 
@@ -268,7 +268,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("POST /api/v1/posts/1, without user, 403")
+    @DisplayName("POST /api/v1/posts/1, without user, 401")
     fun t10() {
         // WHEN
         val resultActions = mockMvc
@@ -289,7 +289,7 @@ class ApiV1PostControllerTest @Autowired constructor(
 
         // THEN
         resultActions
-            .andExpect(status().isForbidden)
+            .andExpect(status().isUnauthorized)
             .andExpect(jsonPath("$.resultCode").value("401-1"))
             .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."))
     }
