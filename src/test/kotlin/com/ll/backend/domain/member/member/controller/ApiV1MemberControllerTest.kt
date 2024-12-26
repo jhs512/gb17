@@ -30,6 +30,11 @@ class ApiV1MemberControllerTest @Autowired constructor(
     private val mockMvc: MockMvc,
     private val memberService: MemberService
 ) {
+    companion object {
+        // 샘플 데이터 생성기를 통해서 만들어진 회원의 수
+        private const val MEMBER_TOTAL_ITEMS = 4
+    }
+
     private fun bodyToRsData(resultActions: ResultActions): RsData<Map<String, *>> {
         val contentAsString = resultActions.andReturn().response.contentAsString
         return Ut.json.toObj(contentAsString)
@@ -57,7 +62,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
 
         val rsData = bodyToRsData(resultActions)
         val newPostId = rsData.data["id"] as Int
-        assertThat(newPostId).isGreaterThan(4)
+        assertThat(newPostId).isGreaterThan(MEMBER_TOTAL_ITEMS)
 
         // THEN
         resultActions
@@ -270,7 +275,7 @@ class ApiV1MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("POST /api/v1/members/login, check cross domain cookies")
+    @DisplayName("POST /api/v1/members/login, make cross domain cookies")
     fun t09() {
         // WHEN
         val resultActions = mockMvc

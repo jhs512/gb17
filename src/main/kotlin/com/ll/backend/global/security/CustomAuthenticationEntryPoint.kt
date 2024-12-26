@@ -16,7 +16,7 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        val rsData: RsData<Empty> = RsData("403-1", "로그인 후 이용해주세요.")
+        val rsData: RsData<Empty> = RsData("401-1", "로그인 후 이용해주세요.")
 
         response.contentType = "application/json;charset=UTF-8"
         response.status = rsData.statusCode

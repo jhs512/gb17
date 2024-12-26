@@ -2,6 +2,7 @@ package com.ll.backend.domain.post.post.controller
 
 import com.ll.backend.domain.post.author.entity.Author
 import com.ll.backend.domain.post.post.dto.PostDto
+import com.ll.backend.domain.post.post.dto.PostWithBodyDto
 import com.ll.backend.domain.post.post.service.PostService
 import com.ll.backend.global.app.AppConfig
 import com.ll.backend.global.rq.Rq
@@ -45,10 +46,10 @@ class ApiV1PostController(
     @Transactional(readOnly = true)
     fun getItem(
         @PathVariable id: Long
-    ): PostDto {
+    ): PostWithBodyDto {
         return postService.findById(id)
             .getOrThrow()
-            .let { PostDto(it) }
+            .let { PostWithBodyDto(it) }
     }
 
 
@@ -56,7 +57,8 @@ class ApiV1PostController(
         @field:NotBlank
         val title: String,
         @field:NotBlank
-        val body: String
+        val content: String,
+        val published: Boolean = false
     )
 
     @PostMapping
@@ -66,7 +68,7 @@ class ApiV1PostController(
     ): RsData<PostDto> {
         postService.checkPermissionToWrite(currentActor)
 
-        val post = postService.write(currentActor, reqBody.title, reqBody.body, true)
+        val post = postService.write(currentActor, reqBody.title, reqBody.content, reqBody.published)
 
         return RsData(
             "201-1",
@@ -93,7 +95,8 @@ class ApiV1PostController(
         @field:NotBlank
         val title: String,
         @field:NotBlank
-        val body: String
+        val content: String,
+        val published: Boolean = false
     )
 
     @PutMapping("/{id}")
@@ -106,7 +109,7 @@ class ApiV1PostController(
 
         postService.checkPermissionToModify(currentActor, post)
 
-        postService.modify(post, reqBody.title, reqBody.body)
+        postService.modify(post, reqBody.title, reqBody.content, reqBody.published)
 
         return RsData(
             "200-1",

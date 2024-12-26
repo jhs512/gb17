@@ -30,7 +30,6 @@ class PostService(
         )
 
         post.body = PostBody(
-            id = post.id,
             post = post,
             content = body
         )
@@ -48,9 +47,8 @@ class PostService(
         postRepository.delete(post)
     }
 
-    fun modify(post: Post, title: String, body: String): Post {
-        post.title = title
-        post.body.content = body
+    fun modify(post: Post, title: String, content: String, published: Boolean): Post {
+        post.modify(title, content, published)
 
         return post
     }

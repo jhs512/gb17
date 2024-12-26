@@ -15,4 +15,8 @@ abstract class BaseTime : BaseEntity() {
 
     @LastModifiedDate
     lateinit var modifyDate: LocalDateTime
+
+    fun setModified() {
+        modifyDate = LocalDateTime.now()
+    }
 }

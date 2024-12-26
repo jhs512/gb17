@@ -54,7 +54,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.title").value("안녕하세요."))
-            .andExpect(jsonPath("$.body").value("반갑습니다."))
+            .andExpect(jsonPath("$.content").doesNotExist())
+            .andExpect(jsonPath("$.published").value(true))
     }
 
     @Test
@@ -73,7 +74,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(2))
             .andExpect(jsonPath("$.title").value("Hello."))
-            .andExpect(jsonPath("$.body").value("Nice to meet you."))
+            .andExpect(jsonPath("$.content").value("Nice to meet you."))
+            .andExpect(jsonPath("$.published").value(true))
     }
 
     @Test
@@ -104,7 +106,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             resultActions
                 .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
                 .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
-                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body.content))
+                .andExpect(jsonPath("$.items[$i].content").doesNotExist())
+                .andExpect(jsonPath("$.items[$i].published").value(posts[i].published))
         }
     }
 
@@ -138,7 +141,8 @@ class ApiV1PostControllerTest @Autowired constructor(
             resultActions
                 .andExpect(jsonPath("$.items[$i].id").value(posts[i].id))
                 .andExpect(jsonPath("$.items[$i].title").value(posts[i].title))
-                .andExpect(jsonPath("$.items[$i].body").value(posts[i].body.content))
+                .andExpect(jsonPath("$.items[$i].content").doesNotExist())
+                .andExpect(jsonPath("$.items[$i].published").value(posts[i].published))
         }
     }
 
@@ -155,7 +159,8 @@ class ApiV1PostControllerTest @Autowired constructor(
                         """
                         {
                             "title": "글 제목",
-                            "body": "글 내용"
+                            "content": "글 내용",
+                            "published": true
                         }
                         """.trimIndent()
                     )
@@ -174,13 +179,42 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.msg").value("${newPostId}번 글이 작성되었습니다."))
             .andExpect(jsonPath("$.data.id").value(newPostId))
             .andExpect(jsonPath("$.data.title").value("글 제목"))
-            .andExpect(jsonPath("$.data.body").value("글 내용"))
+            .andExpect(jsonPath("$.data.content").doesNotExist())
+            .andExpect(jsonPath("$.data.published").value(true))
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/posts, with user1, without content, 400")
+    @WithUserDetails("user1")
+    fun t07() {
+        // WHEN
+        val resultActions = mockMvc
+            .perform(
+                post("/api/v1/posts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                            "title": "글 제목",
+                            "content": "",
+                            "published": true
+                        }
+                        """.trimIndent()
+                    )
+            )
+            .andDo(print())
+
+        // THEN
+        resultActions
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.resultCode").value("400-1"))
+            .andExpect(jsonPath("$.msg").value("content-NotBlank-must not be blank"))
     }
 
     @Test
     @DisplayName("DELETE /api/v1/posts/1, with user1, 200")
     @WithUserDetails("user1")
-    fun t06() {
+    fun t08() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -200,7 +234,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("PUT /api/v1/posts/1, with user1, 200")
     @WithUserDetails("user1")
-    fun t07() {
+    fun t09() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -210,7 +244,8 @@ class ApiV1PostControllerTest @Autowired constructor(
                         """
                         {
                             "title": "제목 수정",
-                            "body": "내용 수정"
+                            "content": "내용 수정",
+                            "published": true
                         }
                         """.trimIndent()
                     )
@@ -224,16 +259,17 @@ class ApiV1PostControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.msg").value("1번 글이 수정되었습니다."))
             .andExpect(jsonPath("$.data.id").value(1))
             .andExpect(jsonPath("$.data.title").value("제목 수정"))
-            .andExpect(jsonPath("$.data.body").value("내용 수정"))
+            .andExpect(jsonPath("$.data.content").doesNotExist())
+            .andExpect(jsonPath("$.data.published").value(true))
 
         val post = postService.findById(1).getOrThrow()
         assertThat(post.title).isEqualTo("제목 수정")
-        assertThat(post.body.content).isEqualTo("내용 수정")
+        assertThat(post.content).isEqualTo("내용 수정")
     }
 
     @Test
     @DisplayName("POST /api/v1/posts/1, without user, 403")
-    fun t08() {
+    fun t10() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -243,7 +279,8 @@ class ApiV1PostControllerTest @Autowired constructor(
                         """
                         {
                             "title": "글 제목",
-                            "body": "글 내용"
+                            "content": "글 내용",
+                            "published": true
                         }
                         """.trimIndent()
                     )
@@ -253,19 +290,18 @@ class ApiV1PostControllerTest @Autowired constructor(
         // THEN
         resultActions
             .andExpect(status().isForbidden)
-            .andExpect(jsonPath("$.resultCode").value("403-1"))
+            .andExpect(jsonPath("$.resultCode").value("401-1"))
             .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."))
     }
 
     @Test
     @DisplayName("DELETE /api/v1/posts/1 with user2, 403")
     @WithUserDetails("user2")
-    fun t09() {
+    fun t11() {
         // WHEN
         val resultActions = mockMvc
             .perform(
                 delete("/api/v1/posts/1")
-                    .contentType(MediaType.APPLICATION_JSON)
             )
             .andDo(print())
 
@@ -281,7 +317,7 @@ class ApiV1PostControllerTest @Autowired constructor(
     @Test
     @DisplayName("PUT /api/v1/posts/1 with user2, 403")
     @WithUserDetails("user2")
-    fun t10() {
+    fun t12() {
         // WHEN
         val resultActions = mockMvc
             .perform(
@@ -291,7 +327,8 @@ class ApiV1PostControllerTest @Autowired constructor(
                         """
                         {
                             "title": "제목 수정",
-                            "body": "내용 수정"
+                            "content": "내용 수정",
+                            "published": true
                         }
                         """.trimIndent()
                     )
@@ -307,47 +344,12 @@ class ApiV1PostControllerTest @Autowired constructor(
 
     @Test
     @WithUserDetails("user1")
-    @DisplayName("POST /api/v1/posts/2, no Permission to modify, 403")
-    fun t11() {
-        // WHEN
-        val resultActions = mockMvc
-            .perform(
-                put("/api/v1/posts/2")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                        {
-                            "title": "글 제목 수정",
-                            "body": "글 내용 수정"
-                        }
-                        """.trimIndent()
-                    )
-            )
-            .andDo(print())
-        // THEN
-        resultActions
-            .andExpect(status().isForbidden)
-            .andExpect(jsonPath("$.resultCode").value("403-1"))
-            .andExpect(jsonPath("$.msg").value("글의 작성자만 수정할 수 있습니다."))
-    }
-
-    @Test
-    @WithUserDetails("user1")
-    @DisplayName("POST /api/v1/posts/2, no Permission to delete, 403")
-    fun t12() {
+    @DisplayName("DELETE /api/v1/posts/2, no permission to delete, 403")
+    fun t13() {
         // WHEN
         val resultActions = mockMvc
             .perform(
                 delete("/api/v1/posts/2")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                        {
-                            "title": "글 제목 수정",
-                            "body": "글 내용 수정"
-                        }
-                        """.trimIndent()
-                    )
             )
             .andDo(print())
 
